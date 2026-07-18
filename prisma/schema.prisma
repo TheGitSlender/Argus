@@ -1,0 +1,307 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SignalSource {
+  DECK
+  APPLICATION
+  GITHUB
+  HACKER_NEWS
+  DEVPOST
+  ARXIV
+  PRODUCT_HUNT
+  BLOG
+  INTERVIEW
+  WEB
+  SYNTHETIC
+  OTHER
+}
+
+enum Dimension {
+  EXECUTION
+  TECHNICAL_DEPTH
+  PROBLEM_INSIGHT
+  RESOURCEFULNESS
+  MOMENTUM
+  COMPOSITE
+}
+
+enum ClaimCategory {
+  TRACTION
+  TEAM
+  MARKET
+  REVENUE
+  PRODUCT
+  TECHNOLOGY
+  OTHER
+}
+
+enum VerificationStatus {
+  VERIFIED
+  UNVERIFIED
+  CONTRADICTED
+}
+
+enum OpportunityStatus {
+  SOURCED
+  SCREENED
+  DILIGENCE
+  DECIDED
+}
+
+enum Track {
+  INBOUND
+  OUTBOUND
+}
+
+enum Axis {
+  FOUNDER
+  MARKET
+  IDEA_VS_MARKET
+}
+
+enum Trend {
+  IMPROVING
+  DECLINING
+  STABLE
+}
+
+enum Decision {
+  INVEST
+  PASS
+  REQUEST_INFO
+}
+
+enum QuestionStatus {
+  PENDING
+  ASKED
+}
+
+enum QuestionOutcome {
+  STRONG
+  WEAK
+  MIXED
+}
+
+/// A person. The Founder Score lives here (via FounderScore) and persists
+/// across opportunities/applications — it never resets (brief FAQ 6).
+model Founder {
+  id        String   @id @default(cuid())
+  name      String
+  email     String?  @unique
+  /// FounderContext (see lib/contracts.ts): solo/team, occupation, prior funding —
+  /// feeds the Resourcefulness denominator.
+  context   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  score              FounderScore?
+  scoreHistory       ScoreHistory[]
+  identities         Identity[]
+  signals            Signal[]
+  interviewQuestions InterviewQuestion[]
+  opportunities      OpportunityFounder[]
+}
+
+/// Current snapshot of the 5-dimension Founder Score. Each dimension is a
+/// ScoreBand JSON: { value, low, high, coverage }. History lives in ScoreHistory.
+model FounderScore {
+  id                      String   @id @default(cuid())
+  founderId               String   @unique
+  founder                 Founder  @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  execution               Json
+  technicalDepth          Json
+  problemInsight          Json
+  resourcefulness         Json
+  momentum                Json
+  composite               Json
+  /// 0-100 discoverability. NEVER an input to the capability dimensions.
+  visibilityIndex         Float
+  /// composite.value - visibilityIndex. High = hidden gem.
+  capabilityVisibilityGap Float
+  updatedAt               DateTime @updatedAt
+}
+
+/// APPEND-ONLY. Never update or delete rows. Every score change records its
+/// causing signal — this powers the trend chart and "never forgets".
+model ScoreHistory {
+  id            String    @id @default(cuid())
+  founderId     String
+  founder       Founder   @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  dimension     Dimension
+  oldBand       Json?
+  newBand       Json
+  causeSignalId String?
+  causeSignal   Signal?   @relation(fields: [causeSignalId], references: [id])
+  rationale     String
+  createdAt     DateTime  @default(now())
+
+  @@index([founderId, createdAt])
+}
+
+/// Entity resolution: links a founder to an external handle with confidence.
+model Identity {
+  id              String       @id @default(cuid())
+  founderId       String
+  founder         Founder      @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  source          SignalSource
+  handle          String
+  url             String?
+  matchConfidence Float
+
+  @@unique([source, handle])
+}
+
+model Company {
+  id            String        @id @default(cuid())
+  name          String
+  oneLiner      String?
+  sector        String?
+  stage         String?
+  geography     String?
+  createdAt     DateTime      @default(now())
+  opportunities Opportunity[]
+}
+
+/// One shot at investing in a company. Axis scores are per-opportunity;
+/// the Founder Score is per-person and only ONE input into the founder axis.
+model Opportunity {
+  id            String              @id @default(cuid())
+  companyId     String
+  company       Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  status        OpportunityStatus   @default(SOURCED)
+  track         Track
+  decision      Decision?
+  /// Signal->decision elapsed-time instrumentation (scored by the brief).
+  firstSignalAt DateTime
+  decidedAt     DateTime?
+  /// Assembled memo document (markdown sections + metadata), null until generated.
+  memo          Json?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  founders      OpportunityFounder[]
+  axisScores    AxisScore[]
+  signals       Signal[]
+}
+
+model OpportunityFounder {
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  founderId     String
+  founder       Founder     @relation(fields: [founderId], references: [id], onDelete: Cascade)
+
+  @@id([opportunityId, founderId])
+}
+
+/// Raw evidence. NOTHING discarded, everything source-tagged and timestamped.
+model Signal {
+  id            String        @id @default(cuid())
+  founderId     String?
+  founder       Founder?      @relation(fields: [founderId], references: [id])
+  opportunityId String?
+  opportunity   Opportunity?  @relation(fields: [opportunityId], references: [id])
+  source        SignalSource
+  sourceUrl     String?
+  rawContent    String        @db.Text
+  /// When the underlying event happened (commit date, launch date...).
+  occurredAt    DateTime?
+  ingestedAt    DateTime      @default(now())
+  meta          Json?
+  claims        Claim[]
+  scoreHistory  ScoreHistory[]
+
+  @@index([founderId])
+  @@index([opportunityId])
+}
+
+/// An extracted assertion. Trust Score is PER CLAIM (brief FAQ 7).
+model Claim {
+  id                 String             @id @default(cuid())
+  signalId           String
+  signal             Signal             @relation(fields: [signalId], references: [id], onDelete: Cascade)
+  text               String
+  category           ClaimCategory
+  /// e.g. "slide 7", "README", "HN comment"
+  sourceLocation     String?
+  specificity        String?
+  trustScore         Float?
+  verificationStatus VerificationStatus @default(UNVERIFIED)
+  /// Validator output: contradicting signal ids, external evidence notes.
+  evidenceRefs       Json?
+  createdAt          DateTime           @default(now())
+
+  @@index([signalId])
+}
+
+/// 3-axis screening. NEVER averaged into one number (brief FAQ 5).
+model AxisScore {
+  id            String      @id @default(cuid())
+  opportunityId String
+  opportunity   Opportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  axis          Axis
+  value         Float
+  trend         Trend
+  rationale     String      @db.Text
+  citedClaimIds String[]
+  createdAt     DateTime    @default(now())
+
+  @@index([opportunityId])
+}
+
+/// Interview Playbook entries: evidence-anchored questions targeting the
+/// widest decision-relevant score bands.
+model InterviewQuestion {
+  id                    String           @id @default(cuid())
+  founderId             String
+  founder               Founder          @relation(fields: [founderId], references: [id], onDelete: Cascade)
+  opportunityId         String?
+  targetDimension       Dimension
+  question              String           @db.Text
+  strongAnswerSignature String           @db.Text
+  redFlagSignature      String           @db.Text
+  expectedBandReduction String?
+  status                QuestionStatus   @default(PENDING)
+  outcome               QuestionOutcome?
+  notes                 String?
+  createdAt             DateTime         @default(now())
+
+  @@index([founderId])
+}
+
+/// Fund-specific lens. Configurable, never hardcoded (brief FAQ 15).
+model Thesis {
+  id                 String   @id @default(cuid())
+  name               String
+  sectors            String[]
+  stages             String[]
+  geographies        String[]
+  checkSizeUsd       Int
+  ownershipTargetPct Float?
+  riskAppetite       String
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+/// APPEND-ONLY. Every LLM call logs here (agentic traceability) and the
+/// cacheKey doubles as an LLM cache — never pay for the same call twice.
+model ReasoningLog {
+  id           String   @id @default(cuid())
+  step         String
+  model        String
+  cacheKey     String?
+  inputRefs    Json
+  output       String   @db.Text
+  inputTokens  Int?
+  outputTokens Int?
+  latencyMs    Int?
+  createdAt    DateTime @default(now())
+
+  @@index([cacheKey])
+  @@index([step, createdAt])
+}
