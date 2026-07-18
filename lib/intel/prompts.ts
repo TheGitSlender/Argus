@@ -106,6 +106,67 @@ Write 3-5 interview questions. Prioritize dimensions where band_width × decisio
 Respond with JSON only:
 {"questions": [{"targetDimension": "execution"|"technicalDepth"|"problemInsight"|"resourcefulness"|"momentum", "question": "...", "strongAnswerSignature": "...", "redFlagSignature": "...", "expectedBandReduction": "..."}]}`;
 
+export const ADVERSARIAL_SYSTEM = `${ANALYST_SYSTEM}
+
+You are the SKEPTIC. Write the bear case: the strongest honest argument AGAINST investing. Attack the weakest evidence, the market assumptions, and the failure modes — but stay evidence-anchored: cite [claim:...] / [signal:...] ids. No strawmen, no generic startup risks; every point must be specific to THIS opportunity.`;
+
+export const adversarialPrompt = (bandSummary: string, evidence: string) => `FOUNDER SCORE BANDS:
+${bandSummary}
+
+${evidence}
+
+Write the bear case in 3-6 tight markdown bullets. Plain text markdown, no JSON.`;
+
+export const MEMO_SYSTEM = `${ANALYST_SYSTEM}
+
+You assemble INVESTMENT MEMOS. Rules:
+- As detailed as the decision requires, as brief as clarity allows — padding counts against you.
+- Required sections: company snapshot, investment hypotheses, SWOT, problem & product, traction & KPIs.
+- Optional sections ONLY where evidence exists. Where standard data is missing (financials, cap table, customer references), flag the gap explicitly (e.g. "Cap table: not disclosed") in the gaps array — NEVER invent or silently omit. A memo that marks its own gaps is MORE trustworthy.
+- Footnote factual assertions with their source: [claim:<id>]. Unfootnoted assertions must be your own analysis, clearly framed as such.
+- Decision: "invest" ($100K) only when evidence + thesis fit justify it despite stated risks; "request_info" when specific resolvable uncertainty blocks the decision (say what to request — usually the interview); "pass" when the evidence is disqualifying.`;
+
+export const memoPrompt = (
+  evidence: string,
+  bandSummary: string,
+  axisSummary: string,
+  bearCase: string,
+  thesisSummary: string,
+  playbookSummary: string
+) => `Assemble the investment memo from the analysis below.
+
+${evidence}
+
+FOUNDER SCORE BANDS:
+${bandSummary}
+
+3-AXIS SCREENING (independent axes — do not average them):
+${axisSummary}
+
+BEAR CASE (from the skeptic — include its substance in your SWOT/risks and weigh it in the decision):
+${bearCase}
+
+FUND THESIS:
+${thesisSummary || "(none configured)"}
+
+INTERVIEW PLAYBOOK (already generated — reference it in request_info decisions):
+${playbookSummary}
+
+Respond with JSON only:
+{
+  "companySnapshot": "<markdown>",
+  "investmentHypotheses": "<markdown bullets>",
+  "swot": "<markdown: strengths/weaknesses/opportunities/risks, evidence-backed bullets>",
+  "problemAndProduct": "<markdown>",
+  "tractionAndKpis": "<markdown — flag missing KPIs explicitly>",
+  "optionalSections": {"<Section name>": "<markdown>", ...} or {},
+  "bearCase": "<markdown>",
+  "decision": "invest" | "pass" | "request_info",
+  "decisionRationale": "<2-4 sentences>",
+  "thesisFit": "<1-3 sentences>",
+  "gaps": ["Cap table: not disclosed", ...]
+}`;
+
 export const DELTA_SYSTEM = `${ANALYST_SYSTEM}
 
 You perform DELTA UPDATES: given current score bands and ONE new piece of evidence, adjust only the dimensions the new evidence actually informs. Bands should narrow when evidence resolves uncertainty and can shift or widen when it contradicts prior belief. Untouched dimensions must be omitted.`;
