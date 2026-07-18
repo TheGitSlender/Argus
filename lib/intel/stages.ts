@@ -15,17 +15,20 @@ import {
 } from "../contracts";
 import { renderEvidence, type EvidenceBundle, type EvidenceClaim, type EvidenceSignal } from "./evidence";
 import {
+  AMBITION_SYSTEM,
   AXIS_SYSTEM,
   DELTA_SYSTEM,
   PLAYBOOK_SYSTEM,
   SCREEN_SYSTEM,
   VALIDATOR_SYSTEM,
+  ambitionPrompt,
   axisPrompts,
   deltaPrompt,
   playbookPrompt,
   screenPrompt,
   validatorPrompt,
 } from "./prompts";
+import { ambitionReadSchema, type AmbitionRead } from "../contracts";
 
 // Remaining pipeline stages. Each is a thin, typed wrapper: render evidence ->
 // one runLLM call -> validated contract output. DB reads/writes happen in the
@@ -39,6 +42,20 @@ export async function screenApplication(bundle: EvidenceBundle): Promise<ScreenR
     system: SCREEN_SYSTEM,
     prompt: screenPrompt(renderEvidence(bundle)),
     schema: screenResultSchema,
+    inputRefs: { founderId: bundle.founder.id ?? null },
+  });
+  return r.parsed;
+}
+
+/** Ambition & Drive read: idea-agnostic, softer than the scored dimensions.
+ * Answers "would we still back this person if this exact idea died?" */
+export async function readAmbition(bundle: EvidenceBundle): Promise<AmbitionRead> {
+  const r = await runLLM({
+    step: "ambition_read",
+    model: MODELS.score,
+    system: AMBITION_SYSTEM,
+    prompt: ambitionPrompt(renderEvidence(bundle)),
+    schema: ambitionReadSchema,
     inputRefs: { founderId: bundle.founder.id ?? null },
   });
   return r.parsed;

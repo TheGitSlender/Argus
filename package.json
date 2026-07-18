@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "test:intel": "tsx --env-file=.env scripts/test-intel.ts"
+    "test:intel": "tsx --env-file=.env scripts/test-intel.ts",
+    "test:pipeline": "tsx --env-file=.env scripts/test-pipeline.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

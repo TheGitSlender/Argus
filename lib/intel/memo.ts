@@ -1,6 +1,7 @@
 import { MODELS, runLLM } from "../llm";
 import {
   memoDocumentSchema,
+  type AmbitionRead,
   type AxisScoreOutput,
   type InterviewPlaybook,
   type MemoDocument,
@@ -23,6 +24,18 @@ export function renderAxisSummary(axes: AxisSet): string {
   return [fmt("FOUNDER", axes.founder), fmt("MARKET", axes.market), fmt("IDEA VS MARKET", axes.idea_vs_market)].join("\n");
 }
 
+export function renderAmbitionSummary(a: AmbitionRead): string {
+  return [
+    `- ambition level: ${a.ambitionLevel} | learning velocity: ${a.learningVelocity} | hype risk: ${a.hypeRisk}`,
+    `- idea-agnostic verdict: ${a.ideaAgnosticVerdict}`,
+    a.resourcefulnessSignals.length ? `- resourcefulness: ${a.resourcefulnessSignals.join("; ")}` : null,
+    a.persistenceEvidence.length ? `- persistence: ${a.persistenceEvidence.join("; ")}` : null,
+    `- rationale: ${a.rationale}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
 export async function adversarialPass(bandSummary: string, bundle: EvidenceBundle): Promise<string> {
   const r = await runLLM({
     step: "adversarial_pass",
@@ -39,6 +52,7 @@ export interface GenerateMemoOptions {
   bandSummary: string;
   axes: AxisSet;
   playbook: InterviewPlaybook;
+  ambition?: AmbitionRead | null;
   thesis?: ThesisConfig | null;
   /** For the signal->decision elapsed-time instrumentation. */
   firstSignalAt?: Date | null;
@@ -61,7 +75,8 @@ export async function generateMemo(opts: GenerateMemoOptions): Promise<{ memo: M
       renderAxisSummary(opts.axes),
       bearCase,
       opts.thesis ? JSON.stringify(opts.thesis) : "",
-      playbookSummary
+      playbookSummary,
+      opts.ambition ? renderAmbitionSummary(opts.ambition) : ""
     ),
     schema: memoDocumentSchema,
     maxTokens: 8192,

@@ -11,7 +11,8 @@ Core rules:
 - Missing evidence means UNCERTAINTY, not a low score. Never fabricate; never guess numbers.
 - Calibration: 50 = a typical credible pre-seed founder. Reserve 85+ for evidence most analysts would call exceptional.
 - Score at integer resolution using the full range — do NOT default to multiples of 5; 63 and 71 are better answers than 65 and 70 when the evidence points there.
-- Cite the [signal:...] / [claim:...] ids that drove your judgment.`;
+- Cite the [signal:...] / [claim:...] ids that drove your judgment.
+- Startup ideas change; most successful companies pivot. Evidence of transferable founder qualities (determination, learning velocity, resourcefulness) outlives the current idea and should weigh accordingly.`;
 
 export const DIMENSION_RUBRICS: Record<DimensionKey, string> = {
   execution: `EXECUTION — do they ship things to completion, and at what velocity?
@@ -23,11 +24,11 @@ Explicitly ignore: stars, forks, framework name-dropping. A README with no code 
   problemInsight: `PROBLEM INSIGHT — do they understand a real problem specifically?
 Weigh deck/writing linguistics: falsifiable claims ("17 of 23 interviewees said X") over adjectives, customer vocabulary, numbers with stated sources, unit-economics awareness.
 Discount: vague TAM waving, buzzword density, problem statements any outsider could write.`,
-  resourcefulness: `RESOURCEFULNESS — output RELATIVE to resources available.
-Use the CONTEXT block as the denominator: a solo unfunded student shipping a working product demonstrates more per unit of opportunity than a funded, well-connected team with identical output.
+  resourcefulness: `RESOURCEFULNESS — output RELATIVE to resources available, and the "relentlessly resourceful" quality: they do whatever it takes to get to their ends.
+Use the CONTEXT block as the denominator: a solo unfunded student shipping a working product demonstrates more per unit of opportunity than a funded, well-connected team with identical output. Weigh obstacle->workaround evidence (shipped despite a day job, hacked around a missing dataset, got users without a budget).
 This is not lowering the bar — it is denominating correctly.`,
-  momentum: `MOMENTUM — the trajectory of all the above.
-Weigh dated evidence: is the recent work stronger, faster, more finished than older work? Recency-weight your read.
+  momentum: `MOMENTUM — the trajectory of all the above, read as LEARNING VELOCITY, not just output recency.
+Weigh dated evidence: is the recent work stronger, faster, more finished than older work? Are iterations coming faster, with stated reasons for changes (tried -> failed -> changed)? A visible learning loop outweighs raw activity.
 If evidence is undated or a single snapshot, say so and stay near the middle with low confidence.`,
 };
 
@@ -77,6 +78,19 @@ Respond with JSON only:
 {"value": <0-100>, "trend": "improving"|"declining"|"stable", "rationale": "<3-5 sentences>", "citedClaimIds": ["<claim id>", ...]}`,
 };
 
+export const AMBITION_SYSTEM = `${ANALYST_SYSTEM}
+
+You perform the AMBITION & DRIVE READ — a deliberately less strict, idea-agnostic assessment of the PERSON. The startup idea can and probably will change; your question is: would we still want to back this founder if this exact idea died?
+Grounding (see docs/research/founder-predictors.md): determination and relentless resourcefulness are the strongest founder qualities; learning velocity (tried -> failed -> changed) signals maturity more than polish; real ambition explains a transformative goal clearly WITHOUT hype and names the risks honestly — big adjectives with no falsifiable commitments are hype, not ambition. Persistence after setbacks beats a hot streak.
+Be generous with thin evidence — mark things "unclear" rather than low — but be unsparing about hype.`;
+
+export const ambitionPrompt = (evidence: string) => `Perform the Ambition & Drive read on this founder.
+
+${evidence}
+
+Respond with JSON only:
+{"ambitionLevel": "transformative"|"substantial"|"modest"|"unclear", "resourcefulnessSignals": ["..."], "learningVelocity": "fast"|"moderate"|"slow"|"unclear", "persistenceEvidence": ["..."], "hypeRisk": "low"|"medium"|"high", "ideaAgnosticVerdict": "back_the_person"|"depends_on_idea"|"unclear", "rationale": "<2-4 sentences>", "citedEvidence": ["signal:<id>" or "claim:<id>", ...]}`;
+
 export const VALIDATOR_SYSTEM = `${ANALYST_SYSTEM}
 
 You are the VALIDATOR. Cross-reference one extracted claim against every other signal available. Look for: internal contradictions (timeline math, implausible scale for the company's age), corroboration, and external plausibility. You protect the investor from confidently-worded fiction.
@@ -94,7 +108,8 @@ Respond with JSON only:
 
 export const PLAYBOOK_SYSTEM = `${ANALYST_SYSTEM}
 
-You write INTERVIEW PLAYBOOKS: the questions are evidence-anchored probes targeting the widest, most decision-relevant uncertainty bands — a calibrated listening guide, not a questionnaire. Never generic ("tell me about your background"); always anchored to a specific artifact or claim in the evidence.`;
+You write INTERVIEW PLAYBOOKS: the questions are evidence-anchored probes targeting the widest, most decision-relevant uncertainty bands — a calibrated listening guide, not a questionnaire. Never generic ("tell me about your background"); always anchored to a specific artifact or claim in the evidence.
+If the founder's ambition or drive signals are unclear or hype-suspicious, include ONE idea-agnostic ambition probe (e.g. anchored to what they did when a previous project stalled, or what they would build if this idea died tomorrow) — tag it to the dimension with the widest band.`;
 
 export const playbookPrompt = (bandSummary: string, evidence: string) => `FOUNDER SCORE BANDS (width = uncertainty; wide bands are what the interview must resolve):
 ${bandSummary}
@@ -132,8 +147,10 @@ export const memoPrompt = (
   axisSummary: string,
   bearCase: string,
   thesisSummary: string,
-  playbookSummary: string
+  playbookSummary: string,
+  ambitionSummary = ""
 ) => `Assemble the investment memo from the analysis below.
+${ambitionSummary ? `\nAMBITION & DRIVE READ (idea-agnostic; feed into Investment Hypotheses and team assessment — an idea can change, the person persists):\n${ambitionSummary}\n` : ""}
 
 ${evidence}
 

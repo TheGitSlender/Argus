@@ -124,6 +124,9 @@ model FounderScore {
   visibilityIndex         Float
   /// composite.value - visibilityIndex. High = hidden gem.
   capabilityVisibilityGap Float
+  /// AmbitionRead (lib/contracts.ts): idea-agnostic drive assessment. Nullable
+  /// until first full pipeline run. Additive field — announced to team.
+  ambitionRead            Json?
   updatedAt               DateTime @updatedAt
 }
 

@@ -142,6 +142,27 @@ export const interviewPlaybookSchema = z.object({
 });
 export type InterviewPlaybook = z.infer<typeof interviewPlaybookSchema>;
 
+// ---- Ambition & Drive read (idea-agnostic, softer than the scored dims) -----
+
+/** Deliberately less strict than the Founder Score: a qualitative read of the
+ * person that survives a pivot. See docs/research/founder-predictors.md. */
+export const ambitionReadSchema = z.object({
+  /** transformative = wants to change an industry; modest = lifestyle/feature. */
+  ambitionLevel: z.enum(["transformative", "substantial", "modest", "unclear"]),
+  /** Concrete evidence of relentless resourcefulness (obstacle -> workaround). */
+  resourcefulnessSignals: z.array(z.string()),
+  learningVelocity: z.enum(["fast", "moderate", "slow", "unclear"]),
+  /** Evidence of persistence/resilience: continued cadence after setbacks. */
+  persistenceEvidence: z.array(z.string()),
+  /** High = big adjectives with no falsifiable commitments (ambition-as-hype). */
+  hypeRisk: z.enum(["low", "medium", "high"]),
+  /** Would we still back this person if this exact idea died? */
+  ideaAgnosticVerdict: z.enum(["back_the_person", "depends_on_idea", "unclear"]),
+  rationale: z.string(),
+  citedEvidence: z.array(z.string()),
+});
+export type AmbitionRead = z.infer<typeof ambitionReadSchema>;
+
 // ---- Delta updates (tracking loop: new signal -> band moves) ----------------
 
 export const deltaUpdateOutputSchema = z.object({

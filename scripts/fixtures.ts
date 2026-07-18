@@ -53,6 +53,51 @@ export const amara: EvidenceBundle = {
   ],
 };
 
+/** The hype case: high visibility, low evidence density — must rank DOWN. */
+export const maxwell: EvidenceBundle = {
+  founder: {
+    id: "maxwell-test",
+    name: "Maxwell Sterling",
+    context: {
+      teamStatus: "cofounders",
+      occupation: "full_time_founder",
+      priorFunding: "$500K angel round 2025",
+      location: "San Francisco",
+      notes: "Ex-FAANG PM, 40K followers.",
+    },
+  },
+  signals: [
+    {
+      id: "sig-mx-gh",
+      source: "GITHUB",
+      sourceUrl: "https://github.com/maxsterling/agi-in-a-box",
+      rawContent:
+        "Repo agi-in-a-box: 4.2K stars from a viral launch tweet, 9 commits total, last commit 7 months ago, README-only architecture promising 'the operating system for AGI agents'.",
+      occurredAt: new Date("2025-12-01"),
+      meta: { stars: 4200, followers: 40000, commitCadence: "abandoned", finishedProjects: 0 },
+    },
+    {
+      id: "sig-mx-tw",
+      source: "WEB",
+      rawContent:
+        "Thread (2.1M views): 'We're building the future of autonomous intelligence. Revolutionary. Unprecedented. DM for early access.' No product link, no demo, no dates.",
+      occurredAt: new Date("2026-05-15"),
+      meta: { pressMentions: 3 },
+    },
+  ],
+  claims: [
+    {
+      id: "clm-mx-1",
+      text: "Building the operating system for AGI agents",
+      category: "product",
+      sourceLocation: "README",
+      specificity: "low",
+      verificationStatus: "UNVERIFIED",
+      trustScore: 0.25,
+    },
+  ],
+};
+
 export const priya: EvidenceBundle = {
   founder: {
     id: "priya-test",
