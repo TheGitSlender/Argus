@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AppLayout from "@/app/components/AppLayout";
+import { thesisFitPct } from "@/lib/thesis-fit";
 import ScoreBand from "@/app/components/ScoreBand";
 
 interface Founder {
@@ -24,6 +25,7 @@ interface RawOpp {
   founders: any[];
   company: any;
   createdAt: string;
+  track?: string;
 }
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
@@ -36,8 +38,12 @@ export default function PipelinePage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/opportunities");
+        const [res, thesisRes] = await Promise.all([
+          fetch("/api/opportunities"),
+          fetch("/api/thesis"),
+        ]);
         const opps = await res.json();
+        const thesisData = await thesisRes.json();
         const mapped: Founder[] = (opps as RawOpp[]).map((opp) => {
           const f = opp.founders?.[0]?.founder;
           const score = f?.score;
@@ -45,12 +51,12 @@ export default function PipelinePage() {
             id: opp.founders?.[0]?.founderId ?? "unknown",
             name: f?.name ?? "Unknown",
             company: opp.company?.name ?? "Unknown",
-            sector: "Unknown",
-            track: "Unknown",
+            sector: opp.company?.sector ?? "—",
+            track: opp.track ?? "—",
             daysInPipeline: Math.floor((Date.now() - new Date(opp.createdAt).getTime()) / 86400000),
             founderScore: score?.composite?.value ?? 0,
             band: [score?.composite?.low ?? 0, score?.composite?.high ?? 0],
-            thesisFit: 0,
+            thesisFit: thesisFitPct(opp.company?.sector, opp.company?.geography, thesisData),
             visibility: score?.visibilityIndex ?? 0,
             capability: score?.composite?.value ?? 0,
           };

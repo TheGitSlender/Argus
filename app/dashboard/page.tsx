@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AppLayout from "@/app/components/AppLayout";
+import { thesisFitPct } from "@/lib/thesis-fit";
 import ScatterChart from "@/app/components/ScatterChart";
 import ScoreBand from "@/app/components/ScoreBand";
 
@@ -59,10 +60,10 @@ export default function DashboardPage() {
             id: opp.founders?.[0]?.founderId ?? "unknown",
             name: f?.name ?? "Unknown",
             company: opp.company?.name ?? "Unknown",
-            sector: "Unknown",
+            sector: opp.company?.sector ?? "—",
             founderScore: score?.composite?.value ?? 0,
             band: [score?.composite?.low ?? 0, score?.composite?.high ?? 0],
-            thesisFit: 0,
+            thesisFit: thesisFitPct(opp.company?.sector, opp.company?.geography, thesisData),
             visibility: score?.visibilityIndex ?? 0,
             capability: score?.composite?.value ?? 0,
             daysInPipeline: Math.floor((Date.now() - new Date(opp.createdAt).getTime()) / 86400000),
