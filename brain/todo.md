@@ -21,12 +21,12 @@ Status rollup in [[main]]. Per-commit history in `changelog/`.
 - [x] Adversarial pass + memo generator
 - [x] Ambition & Drive read + research doc
 - [x] Pipeline orchestrator (DB-free)
-- [ ] **Persistence layer**: save FounderScore, append ScoreHistory, update Claims from validations, store memo — ⏳ blocked on DB
-- [ ] **API routes / server actions** per stage for Track C — ⏳ blocked on DB
+- [x] Persistence layer written (`lib/persist.ts`) — ⏳ runtime-untested until DB
+- [x] API routes written (7 endpoints incl. interview-notes loop, intake, NL query) — ⏳ runtime-untested until DB
+- [ ] Live route testing + Founder Score persistence demo — ⏳ blocked on DB
+- [x] Interview-notes → Signal → delta-update loop endpoint (`POST /api/founders/[id]/signals`)
+- [x] NL query → structured filter endpoint (`POST /api/query`)
 - [ ] Streaming memo endpoint (demo polish)
-- [ ] Interview-notes → Signal → delta-update → bands-narrow loop endpoint (demo beat #5)
-- [ ] NL query → structured filter endpoint (cut-first list)
-- [ ] Founder Score persistence demo (re-application carries score over)
 
 ## Track A — Data & Memory ([[tracks/track-a-data]])
 

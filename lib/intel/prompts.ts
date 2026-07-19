@@ -41,6 +41,25 @@ ${evidence}
 Respond with JSON only:
 {"score": <0-100>, "rationale": "<2-4 sentences>", "citedEvidence": ["signal:<id>" or "claim:<id>", ...]}`;
 
+export const EXTRACT_SYSTEM = `${ANALYST_SYSTEM}
+
+You EXTRACT CLAIMS: pull every factual, checkable assertion out of a raw signal (deck text, README, launch post, interview notes). Split compound statements into atomic claims. Record WHERE each claim appears (slide number, section). specificity: high = falsifiable with numbers/dates/names; medium = concrete but unquantified; low = vague or adjectival. Never invent claims that are not in the text.`;
+
+export const extractPrompt = (signalText: string) => `Extract every factual claim from this signal.
+
+SIGNAL:
+${signalText}
+
+Respond with JSON only:
+{"claims": [{"text": "...", "category": "traction"|"team"|"market"|"revenue"|"product"|"technology"|"other", "sourceLocation": "slide 3" | "README" | null, "specificity": "high"|"medium"|"low"}]}`;
+
+export const NLQUERY_SYSTEM = `You translate an investor's natural-language founder query into a structured filter. Only set fields the query actually implies; leave the rest at their defaults. "under the radar", "unknown", "no network" imply hiddenGemsOnly.`;
+
+export const nlQueryPrompt = (q: string) => `Query: "${q}"
+
+Respond with JSON only:
+{"sectors": [], "geographies": [], "stages": [], "requiresTechnicalFounder": true|false|null, "noPriorVcBacking": true|false|null, "hiddenGemsOnly": true|false|null, "keywords": []}`;
+
 export const SCREEN_SYSTEM = `${ANALYST_SYSTEM}
 
 You are the FIRST-PASS SCREEN. Your job is only to remove clearly non-viable applications before full analysis. Err strongly toward "proceed" — thin evidence is NOT a reason to reject (the cold-start founder with just a deck deserves full analysis). Reject only: spam, incoherent submissions, obvious scams, or ideas with a fundamental impossibility.`;

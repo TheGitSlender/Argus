@@ -18,21 +18,58 @@ import {
   AMBITION_SYSTEM,
   AXIS_SYSTEM,
   DELTA_SYSTEM,
+  EXTRACT_SYSTEM,
+  NLQUERY_SYSTEM,
   PLAYBOOK_SYSTEM,
   SCREEN_SYSTEM,
   VALIDATOR_SYSTEM,
   ambitionPrompt,
   axisPrompts,
   deltaPrompt,
+  extractPrompt,
+  nlQueryPrompt,
   playbookPrompt,
   screenPrompt,
   validatorPrompt,
 } from "./prompts";
-import { ambitionReadSchema, type AmbitionRead } from "../contracts";
+import {
+  ambitionReadSchema,
+  extractionOutputSchema,
+  nlQueryFilterSchema,
+  type AmbitionRead,
+  type ExtractionOutput,
+  type NlQueryFilter,
+} from "../contracts";
 
 // Remaining pipeline stages. Each is a thin, typed wrapper: render evidence ->
 // one runLLM call -> validated contract output. DB reads/writes happen in the
 // route handlers that call these, not here.
+
+/** Stage 1: extract atomic claims from one raw signal. */
+export async function extractClaims(signal: EvidenceSignal): Promise<ExtractionOutput> {
+  const r = await runLLM({
+    step: "extract_claims",
+    model: MODELS.extract,
+    system: EXTRACT_SYSTEM,
+    prompt: extractPrompt(signal.rawContent),
+    schema: extractionOutputSchema,
+    inputRefs: { signalId: signal.id },
+  });
+  return r.parsed;
+}
+
+/** NL query bar: "technical founder, Berlin, AI infra, no prior VC" -> filter. */
+export async function nlQueryToFilter(query: string): Promise<NlQueryFilter> {
+  const r = await runLLM({
+    step: "nl_query",
+    model: MODELS.extract,
+    system: NLQUERY_SYSTEM,
+    prompt: nlQueryPrompt(query),
+    schema: nlQueryFilterSchema,
+    inputRefs: { query },
+  });
+  return r.parsed;
+}
 
 /** Stage 3: fast first-pass screen. Permissive by design — cold-start proceeds. */
 export async function screenApplication(bundle: EvidenceBundle): Promise<ScreenResult> {

@@ -20,7 +20,7 @@ updated: 2026-07-19
 | Database | ❌ Not yet created (Neon planned) — **blocking** persistence + routes |
 | Deployment | ❌ Vercel not yet connected |
 | LLM runtime | ✅ OpenAI key active ($50 budget) — gpt-4.1-nano / mini / 4.1 tiers |
-| Pipeline | ✅ Full run verified · ✅ Track A corpus flows into it (36 profiles → bundles) |
+| Pipeline | ✅ Full run verified · ✅ Track A corpus flows into it · ✅ 7 API routes built (untested — need DB) |
 | Synthetic corpus | ✅ 36 profiles / 40 signals / 54 claims / 4 contradiction cases (Track A) |
 | UI | ❌ Not started (Track C) |
 
@@ -35,7 +35,7 @@ updated: 2026-07-19
 - [[research/founder-predictors]] — what actually predicts a good founder
 - [[demo-script]] — the 5-minute demo beats
 - Tracks: [[tracks/track-a-data]] · [[tracks/track-b-intelligence]] · [[tracks/track-c-experience]]
-- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]]
+- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]] → [[changelog/2026-07-19-persistence-and-api]]
 
 ## 👥 Team & tracks
 
