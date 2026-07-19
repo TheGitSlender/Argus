@@ -1,0 +1,6 @@
+{"candidateId":"candidate-email-amina","name":"Amina Kader","email":"amina@docklens.example.invalid","companyName":"DockLens","location":"Tangier, Morocco","identities":[{"source":"BLOG","handle":"amina-field-notes","url":"synthetic://identity/blog/amina-field-notes"}]}
+{"candidateId":"candidate-handle-nadia","name":"Nadya Voss","companyName":"FreightBloom","location":"Hamburg, Germany","identities":[{"source":"PRODUCT_HUNT","handle":"freightbloom","url":"synthetic://identity/product-hunt/freightbloom"}]}
+{"candidateId":"candidate-review-omar","name":"Omar Haddad","companyName":"RepairLoop","location":"Amman, Jordan","identities":[]}
+{"candidateId":"candidate-name-only-marta","name":"Marta Silva","companyName":"Different Venture","location":"Porto, Portugal","identities":[]}
+{"candidateId":"candidate-conflict","name":"Amina Kader","email":"amina@docklens.example.invalid","companyName":"DockLens","location":"Tangier, Morocco","identities":[{"source":"GITHUB","handle":"jnowak-queryforge","url":"synthetic://identity/github/jnowak-queryforge"}]}
+{"candidateId":"candidate-new","name":"Zoe Quill","email":"zoe@unmatched.example.invalid","companyName":"Unmatched Works","location":"Reykjavik, Iceland","identities":[]}

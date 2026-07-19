@@ -2,7 +2,7 @@
 
 ## Current gate
 
-- Gate: 2 — Idempotent Postgres importer
+- Gate: 3 — Entity resolution
 - State: accepted
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
@@ -60,6 +60,18 @@
 - [ ] Configure `ADAPTION_API_KEY` in ignored `.env`.
 - [ ] Run the five-row estimate-first spike and full deck batch after the remaining core Person A functionality is accepted.
 
+## Gate 3 checklist
+
+- [x] Add a deterministic entity-candidate contract and resolver.
+- [x] Auto-link exact email or exact source/handle matches only.
+- [x] Route name plus company/location matches to review without merging.
+- [x] Reject conflicting exact identifiers and ambiguous homonyms.
+- [x] Persist only identities attached to exact accepted matches.
+- [x] Generate a review report for non-linked candidates.
+- [x] Verify idempotent apply behavior and protected-table counts.
+- [x] Run tests, type checks, lint, and ownership audit.
+- [x] Present evidence and receive explicit Gate 3 acceptance.
+
 ## Blockers
 
 - None for Gate 0. Adaption and OpenAI credentials remain deferred until their live gates.
@@ -102,3 +114,12 @@
 - `ScoreHistory` remains 1 and `ReasoningLog` remains 0.
 - Gate 1 + Gate 2 tests: 10 passed, 0 failed; ESLint and `tsc --noEmit` pass.
 - User accepted Gate 2.
+- Gate 2 committed as `dc5db83` by `Aress07` with no co-author metadata.
+- Gate 3 dry-run resolved 6 candidates as 2 exact links, 1 review, 2 unresolved, and 1 conflict.
+- First apply created exactly 1 new BLOG identity and reused 1 existing Product Hunt identity; review/unresolved/conflict cases produced no writes.
+- Second apply created zero identities and reused both exact matches.
+- Review report written outside the repository at `C:\Users\taham\AppData\Local\Temp\argus-track-a-entity-resolution-report.json`.
+- Identity total is 32; Amina's exact-email BLOG identity is persisted at confidence 1.0.
+- `ScoreHistory` remains 1 and `ReasoningLog` remains 0.
+- Gate 1–3 regression suite: 17 passed, 0 failed; ESLint and `tsc --noEmit` pass.
+- User accepted Gate 3.
