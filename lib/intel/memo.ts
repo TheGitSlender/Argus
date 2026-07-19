@@ -75,7 +75,16 @@ export interface GenerateMemoOptions {
 }
 
 export async function generateMemo(opts: GenerateMemoOptions): Promise<{ memo: MemoDocument; bearCase: string }> {
-  const adversarial = await adversarialPass(opts.bandSummary, opts.bundle);
+  let adversarial: AdversarialOutput;
+  try {
+    adversarial = await adversarialPass(opts.bandSummary, opts.bundle);
+  } catch (err) {
+    console.warn("[memo] adversarial pass failed, using placeholder:", err);
+    adversarial = {
+      bullets: [{ severity: "low", point: "Adversarial analysis unavailable due to processing error.", evidenceRefs: [] }],
+      summary: "Bear case could not be generated.",
+    };
+  }
   const bearCase = renderAdversarialBullets(adversarial);
 
   const playbookSummary = opts.playbook.questions

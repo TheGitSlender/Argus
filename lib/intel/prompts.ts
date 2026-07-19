@@ -159,6 +159,7 @@ export const MEMO_SYSTEM = `${ANALYST_SYSTEM}
 
 You assemble INVESTMENT MEMOS. Rules:
 - As detailed as the decision requires, as brief as clarity allows — padding counts against you.
+- START with a Decision Card (3 lines max): (1) verdict + composite score, (2) the single most important reason, (3) the top risk. This is the first thing a human reads — make every word count.
 - Required sections: company snapshot, investment hypotheses, SWOT, problem & product, traction & KPIs.
 - Mandatory gap-flagging: for EVERY required section, if the evidence doesn't support it, you MUST still write the section header with "Insufficient evidence to assess" AND add the gap to the gaps array. Never silently omit a required section. A memo that marks its own gaps is MORE trustworthy than one that pretends gaps don't exist.
 - Optional sections ONLY where evidence exists — same gap-flagging rule applies.
