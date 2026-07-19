@@ -30,12 +30,12 @@ Status rollup in [[main]]. Per-commit history in `changelog/`.
 
 ## Track A — Data & Memory ([[tracks/track-a-data]])
 
-- [ ] Adaption Labs hour-0 spike (upload → estimate → run → download, record credit burn)
-- [ ] Fetchers: GitHub · HN Algolia · Devpost · arXiv · Product Hunt
-- [ ] Deck text extraction (`unpdf`) + claim extraction into Signal/Claim
-- [ ] Synthetic corpus: 30-40 profiles across the capability×visibility grid (one owner!)
-- [ ] Entity resolution / dedup population of Identity
-- [ ] Corpus quality metrics surfaced from Adaption eval
+- [x] Synthetic corpus: 36 profiles across the capability×visibility grid (Gate 1 ✅, integration-verified)
+- [ ] Integration feedback: hidden-gem evidence density + structured visibility meta (see [[tracks/track-a-data]])
+- [ ] Adaption Labs spike (their Gate 2; needs `ADAPTION_API_KEY`)
+- [ ] Full deck/claim batch (Gate 3) · Postgres importer (Gate 4, needs shared DB)
+- [ ] Entity resolution (Gate 5) · runtime extraction fallback (Gate 6)
+- [ ] Fetchers: GitHub first (their stretch gate)
 
 ## Track C — Experience ([[tracks/track-c-experience]])
 

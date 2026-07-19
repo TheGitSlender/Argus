@@ -15,14 +15,14 @@ updated: 2026-07-19
 
 | Field | Value |
 |---|---|
-| Phase | Intelligence layer **complete & live-tested**; awaiting DB + deployment |
-| Branches | `main` (foundation), `track-b-intel` (intelligence, ahead of main) |
+| Phase | Intelligence layer live-tested · Track A corpus shipped & integration-verified |
+| Branches | `main` · `track-b-intel` · `track-a-data` (Gates 0-1 ✅) · `integration/ab-test` (A+B merged, tests pass) |
 | Database | ❌ Not yet created (Neon planned) — **blocking** persistence + routes |
 | Deployment | ❌ Vercel not yet connected |
 | LLM runtime | ✅ OpenAI key active ($50 budget) — gpt-4.1-nano / mini / 4.1 tiers |
-| Pipeline | ✅ Full run verified: screen → score → ambition → axes → validate → playbook → memo |
+| Pipeline | ✅ Full run verified · ✅ Track A corpus flows into it (36 profiles → bundles) |
+| Synthetic corpus | ✅ 36 profiles / 40 signals / 54 claims / 4 contradiction cases (Track A) |
 | UI | ❌ Not started (Track C) |
-| Ingestion/fetchers | ❌ Not started (Track A) |
 
 ## 🗺️ Map of this brain
 
@@ -35,14 +35,14 @@ updated: 2026-07-19
 - [[research/founder-predictors]] — what actually predicts a good founder
 - [[demo-script]] — the 5-minute demo beats
 - Tracks: [[tracks/track-a-data]] · [[tracks/track-b-intelligence]] · [[tracks/track-c-experience]]
-- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]]
+- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]]
 
 ## 👥 Team & tracks
 
 | Track | Owner | Scope | Status |
 |---|---|---|---|
 | B — Intelligence | Lead + Claude | Founder Score, axes, validator, memo, playbook | 🟢 Core done |
-| A — Data & Memory | Teammate 1 | Fetchers, Adaption spike, synthetic corpus, ingestion | ⚪ Not started |
+| A — Data & Memory | Teammate 1 (Aress07) | Fetchers, Adaption spike, synthetic corpus, ingestion | 🟢 Gates 0-1 done (corpus shipped) |
 | C — Experience | Teammate 2 | 5 screens, /debug viewer | ⚪ Not started |
 
 ## 🎯 Evaluation weights (memorize)
