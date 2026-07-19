@@ -3,7 +3,7 @@
 ## Current gate
 
 - Gate: 5 — Handoff and freeze
-- State: accepted; ready to commit
+- State: accepted and committed; not pushed
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
 
@@ -197,3 +197,4 @@
 - Stopped only `argus-track-a-gate5` after verification; its named rebuild data remains available while primary `argus-track-a` remains running.
 - Clean-rebuild Groq usage was exactly 1 logged call with 380 input tokens, 574 output tokens, and 1,084 ms latency; replay added no call. Exact monetary charge was not exposed and is not fabricated.
 - User explicitly accepted Gate 5.
+- Gate 5 committed as `ae89c93` by `Aress07 <taha.mahha21@gmail.com>` with no co-author or assistant contributor metadata.
