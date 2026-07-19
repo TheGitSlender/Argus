@@ -72,6 +72,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/sourcing", label: "Sourcing", icon: <SourcingIcon /> },
   { href: "/intake", label: "Intake", icon: <IntakeIcon /> },
   { href: "/settings", label: "Settings", icon: <SettingsIcon /> },
+  { href: "/debug", label: "Debug", icon: <SettingsIcon /> },
 ];
 
 export default function Sidebar() {

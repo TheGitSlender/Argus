@@ -13,6 +13,7 @@ interface Founder {
   name: string;
   company: string;
   sector: string;
+  geography: string;
   founderScore: number;
   band: [number, number];
   thesisFit: number;
@@ -42,6 +43,26 @@ export default function DashboardPage() {
   const [founders, setFounders] = useState<Founder[] | null>(null);
   const [thesis, setThesis] = useState<Thesis | null>(null);
   const [query, setQuery] = useState("");
+  const [nlFilter, setNlFilter] = useState<{ sectors: string[]; geographies: string[]; keywords: string[]; hiddenGemsOnly?: boolean | null } | null>(null);
+  const [nlLoading, setNlLoading] = useState(false);
+
+  async function runNlQuery() {
+    if (query.trim().length < 3) return;
+    setNlLoading(true);
+    try {
+      const res = await fetch("/api/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ q: query }),
+      });
+      const data = await res.json();
+      if (data.filter) setNlFilter(data.filter);
+    } catch (err) {
+      console.error("NL query failed:", err);
+    } finally {
+      setNlLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -61,6 +82,7 @@ export default function DashboardPage() {
             name: f?.name ?? "Unknown",
             company: opp.company?.name ?? "Unknown",
             sector: opp.company?.sector ?? "—",
+            geography: opp.company?.geography ?? "—",
             founderScore: score?.composite?.value ?? 0,
             band: [score?.composite?.low ?? 0, score?.composite?.high ?? 0],
             thesisFit: thesisFitPct(opp.company?.sector, opp.company?.geography, thesisData),
@@ -93,7 +115,21 @@ export default function DashboardPage() {
 
   const sorted = founders
     ? [...founders]
-        .filter((f) => !query || f.name.toLowerCase().includes(query.toLowerCase()) || f.company.toLowerCase().includes(query.toLowerCase()))
+        .filter((f) => {
+          if (nlFilter) {
+            const inList = (value: string, list: string[]) =>
+              list.length === 0 || list.some((x) => value.toLowerCase().includes(x.toLowerCase()) || x.toLowerCase().includes(value.toLowerCase()));
+            if (!inList(f.sector, nlFilter.sectors)) return false;
+            if (!inList(f.geography, nlFilter.geographies)) return false;
+            if (nlFilter.hiddenGemsOnly && f.capability - f.visibility <= 30) return false;
+            if (nlFilter.keywords.length > 0) {
+              const hay = `${f.name} ${f.company} ${f.sector}`.toLowerCase();
+              if (!nlFilter.keywords.some((k) => hay.includes(k.toLowerCase()))) return false;
+            }
+            return true;
+          }
+          return !query || f.name.toLowerCase().includes(query.toLowerCase()) || f.company.toLowerCase().includes(query.toLowerCase());
+        })
         .sort((a, b) => b.founderScore - a.founderScore)
     : [];
 
@@ -118,11 +154,22 @@ export default function DashboardPage() {
           <h2 style={{ margin: 0 }}>Dashboard</h2>
           <input
             className="input"
-            placeholder="Search founders, companies"
+            placeholder={nlLoading ? "Interpreting query…" : "Search, or ask: 'technical founder, Berlin, ai-infra, hidden gems' — press Enter"}
+            onKeyDown={(e) => { if (e.key === "Enter") runNlQuery(); }}
             style={{ maxWidth: 280 }}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => { setQuery(e.target.value); if (nlFilter) setNlFilter(null); }}
           />
+          {nlFilter && (
+            <span className="tag tag-neutral" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              AI filter:
+              {nlFilter.sectors.length > 0 && ` sectors=${nlFilter.sectors.join("/")}`}
+              {nlFilter.geographies.length > 0 && ` geo=${nlFilter.geographies.join("/")}`}
+              {nlFilter.hiddenGemsOnly && " 💎 hidden gems"}
+              {nlFilter.keywords.length > 0 && ` kw=${nlFilter.keywords.join(",")}`}
+              <button onClick={() => setNlFilter(null)} style={{ border: "none", background: "none", cursor: "pointer", fontSize: 12 }}>✕</button>
+            </span>
+          )}
         </div>
 
         {founders === null ? (
