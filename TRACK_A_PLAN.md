@@ -5,6 +5,7 @@
 - Work only on `track-a-data`.
 - Read this file and `TRACK_A_STATUS.md` before each work session.
 - Implement exactly one gate at a time. Do not start the next gate until the current gate's checks pass and the user accepts it.
+- Update `TRACK_A_STATUS.md` whenever a gate advances, a build decision changes, or new verification evidence is produced.
 - Before editing a tracked file, use Git history to identify its creator. Edit only files created by `Aress07`; request explicit permission for every exception.
 - Preserve unrelated changes and untracked files.
 - Do not modify `lib/contracts.ts`, `prisma/schema.prisma`, `lib/llm.ts`, `prisma/seed.ts`, or `package.json` without explicit per-file permission.
@@ -105,6 +106,7 @@ Acceptance: another teammate can rebuild Track A from a clean test database and 
 ## Fixed assumptions
 
 - The primary path is synthetic data through the local pipeline; Adaption and public-source fetchers are deferred until core Track A functionality works end to end.
-- Gate 0 uses named local Prisma Postgres/PGlite; Adaption and OpenAI credentials are required only before their first live gates.
+- Gate 0 uses named local Prisma Postgres/PGlite; Adaption and OpenAI-compatible credentials are required only before their first live gates.
+- During development, runtime extraction may use Groq through the inherited OpenAI-compatible `runLLM()` boundary; switching to OpenAI later is environment-only and must not fork the pipeline.
 - The challenge PDF is currently absent. If supplied, reconcile it before continuing because the handoff names it as source of truth.
 - Existing tracked files remain immutable unless the user authorizes a named exception.

@@ -2,15 +2,15 @@
 
 ## Current gate
 
-- Gate: 3 — Entity resolution
-- State: accepted
+- Gate: 4 — Local deck extraction and runtime claim extraction
+- State: accepted; ready to commit and push
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
 
 ## Ownership baseline
 
 - All files inherited from `main` were created by `TheGitSlender` and are read-only.
-- Aress07-owned files: `TRACK_A_PLAN.md`, `TRACK_A_STATUS.md`.
+- Aress07-owned files: `TRACK_A_PLAN.md`, `TRACK_A_STATUS.md`, and the Track A files added under `scripts/track-a/` by accepted/local gates.
 - Preserved unrelated untracked paths: `.agents/`, `VC_BRAIN_HANDOFF.md`, `skills-lock.json`.
 
 ## Gate 0 checklist
@@ -33,6 +33,9 @@
 - Live fetchers: deferred stretch; GitHub first if explicitly activated.
 - Existing-file edits require explicit per-file approval.
 - Work cannot advance to Gate 1 until Gate 0 is accepted.
+- `TRACK_A_STATUS.md` is the live build ledger and must be updated whenever work advances or verification changes gate evidence.
+- Runtime extraction uses Groq during development through `OPENAI_BASE_URL`; the later OpenAI switch changes environment configuration only.
+- Upstream changes are merged from `origin/main` into `track-a-data` only; main is never changed or pushed by that operation.
 
 ## Gate 1 checklist
 
@@ -72,10 +75,23 @@
 - [x] Run tests, type checks, lint, and ownership audit.
 - [x] Present evidence and receive explicit Gate 3 acceptance.
 
+## Gate 4 checklist
+
+- [x] Add deterministic local PDF text extraction with slide markers and source hashing.
+- [x] Add idempotent extracted-deck ingestion into `Signal` without changing inherited seed code.
+- [x] Cover multi-page, empty-page, malformed, encrypted, and overwrite-safety behavior.
+- [x] Add a default-dry-run runtime claim replay capped at three Signals.
+- [x] Route every extraction call through `runLLM()` with the frozen extraction contract.
+- [x] Skip Adaption-processed Signals and reject claims not grounded verbatim in source text.
+- [x] Prevent duplicate Claims within model output and across reruns.
+- [x] Verify one provider call is logged and an explicit replay uses the existing cache.
+- [x] Run regressions, type checks, lint, database checks, and ownership audit.
+- [x] Present evidence and receive authorization to finalize and push Gate 4.
+
 ## Blockers
 
-- None for Gate 0. Adaption and OpenAI credentials remain deferred until their live gates.
-- `prisma-postgres` was installed previously but is not exposed in the current turn's available-skill catalog.
+- None for Gate 4.
+- Adaption remains explicitly deferred by the user.
 
 ## Evidence log
 
@@ -123,3 +139,33 @@
 - `ScoreHistory` remains 1 and `ReasoningLog` remains 0.
 - Gate 1–3 regression suite: 17 passed, 0 failed; ESLint and `tsc --noEmit` pass.
 - User accepted Gate 3.
+- Gate 4 local PDF extraction uses pinned `pypdf==6.14.2` from a temporary virtual environment; no inherited dependency files changed.
+- PDF tests cover deterministic two-page extraction, slide markers, source hashing, empty slides, malformed files, password-protected files, and overwrite protection.
+- Extracted deck JSON validates before a default-dry-run, idempotent `Signal` ingestion step; canonical source URL collisions are rejected.
+- Runtime claim extraction calls only the inherited `runLLM()` wrapper with `MODELS.extract`, `extractionOutputSchema`, `extract_claims`, and `inputRefs.signalId`; caching remains enabled.
+- A deterministic grounding boundary rejects any claim that is not a source substring and rejects incorrect slide locations before database insertion.
+- Gate 1–4 TypeScript regression suite: 27 passed, 0 failed; ESLint and `tsc --noEmit` pass.
+- Gate 4 Python suite: 4 passed, 0 failed.
+- End-to-end no-write smoke test passed: temporary PDF → extraction JSON → deck ingestion plan → claim replay selection.
+- Replay dry-run selected one eligible unclaimed Product Hunt Signal and made no LLM call.
+- Missing-key apply check stopped before a provider call or write; database remains at 45 Signals, 60 Claims, 0 ReasoningLogs, and 1 ScoreHistory row.
+- Development runtime is configured for Groq's OpenAI-compatible endpoint with `openai/gpt-oss-20b`; no inherited LLM code changed.
+- First live extraction processed one eligible Product Hunt Signal, created 2 verbatim-grounded Claims, and appended exactly 1 `extract_claims` ReasoningLog.
+- The logged call used 380 input tokens and 569 output tokens.
+- Explicit replay of the same Signal returned `cached: true`, made no new provider call, and created 0 duplicate Claims.
+- Database totals after live verification: 45 Signals, 62 Claims, 1 ReasoningLog, and 1 ScoreHistory row.
+- Fetched `origin/main` at `0e0b2c8` and merged it into `track-a-data` as `5649581`; `origin/main` remained unchanged and nothing was pushed.
+- Restored all isolated Gate 4/ledger work after the merge; the pre-existing `.gitignore` change auto-merged without conflict, and unrelated local paths remained untouched.
+- Reviewed main's updated frozen interfaces read-only: claim extraction contracts and the `runLLM()` call shape remain compatible with Gate 4.
+- Applied main's additive nullable `FounderScore.ambitionRead` field to local PGlite with `prisma db push`; Prisma Client 6.19.3 regenerated successfully.
+- Post-merge checks pass: 27 Track A TypeScript tests, 4 PDF tests, and `tsc --noEmit`; project ESLint reports 0 errors and 1 inherited warning in `lib/intel/prompts.ts`.
+- Post-merge claim replay dry-run selected 0 Signals and made no provider call because all current Signals now have Claims.
+- Final Gate 4 verification passed: 4 Python tests, 27 TypeScript tests, `tsc --noEmit`, and the Next.js 16 production build.
+- Project ESLint completed with zero errors and one inherited warning in `lib/intel/prompts.ts`; no inherited file was edited to suppress it.
+- Corpus validator returned 36 profiles, 10 decks, 40 Signals, 54 reference Claims, and 4 contradiction cases.
+- Importer dry-run created zero rows and reused the complete corpus; protected counts remained 1 ScoreHistory and 1 ReasoningLog.
+- Entity-resolution dry-run remained 2 linked, 1 review, 2 unresolved, and 1 conflict with zero writes.
+- Explicit runtime replay remained a cache hit and created zero Claims, confirming no additional provider call or duplicate insertion.
+- Production HTTP smoke test passed: homepage 200, 38 opportunities returned, active thesis `Maschmeyer AI Seed Thesis`, and no server errors.
+- Added `TRACK_A_TESTING.md` with reproducible environment, database, regression, PDF, ingestion, cache, application, and safety checks.
+- User authorized final verification, documentation, commit, and push to `track-a-data`; Gate 5 remains unstarted.
