@@ -3,7 +3,7 @@
 ## Current gate
 
 - Gate: 4 — Local deck extraction and runtime claim extraction
-- State: accepted; ready to commit and push
+- State: accepted, committed, and pushed; Gate 5 not started
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
 
@@ -169,3 +169,5 @@
 - Production HTTP smoke test passed: homepage 200, 38 opportunities returned, active thesis `Maschmeyer AI Seed Thesis`, and no server errors.
 - Added `TRACK_A_TESTING.md` with reproducible environment, database, regression, PDF, ingestion, cache, application, and safety checks.
 - User authorized final verification, documentation, commit, and push to `track-a-data`; Gate 5 remains unstarted.
+- Gate 4 committed as `ed745e0` by `Aress07 <taha.mahha21@gmail.com>` with no co-author or assistant contributor metadata.
+- Pushed merged main history plus accepted Gates 2–4 to `origin/track-a-data`; `origin/main` was not changed.
