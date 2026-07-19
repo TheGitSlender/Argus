@@ -15,7 +15,7 @@ updated: 2026-07-19
 
 | Field | Value |
 |---|---|
-| Phase | **All 3 tracks merged to `main`. Full stack verified.** |
+| Phase | **FEATURE-COMPLETE — presentation prep.** All MVP reqs + stretch goals demonstrated ([[objectives-audit]]) |
 | Branches | `main` (single trunk, all tracks merged) |
 | Database | ✅ **Neon = canonical (prod)** — corpus imported (41 founders / 94 claims); local Postgres instances are per-dev scratch |
 | Deployment | ✅ **Vercel live** — prod deploys `main`; 9 API routes + 6 frontend pages served |
@@ -30,6 +30,9 @@ updated: 2026-07-19
 ## 🗺️ Map of this brain
 
 - [[objectives-audit]] — **final compliance audit vs the brief**
+- [[tech-video]] — shot-by-shot tech explainer script
+- `DEMO_HANDOFF.md` (repo root) — product demo beats, deck outline, judge Q&A
+- `HANDOFF.md` (repo root) — full application structure reference
 - [[architecture]] — system design, pipeline flow, stack
 - [[data-model]] — every table and *why* it exists
 - [[intelligence-layer]] — Track B deep dive: engines, prompts, verified outputs
