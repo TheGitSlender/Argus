@@ -58,6 +58,7 @@ npm run test:intel    # LLM smoke test (screen → score → validate → memo)
 app/
   dashboard/          Main dashboard (scatter chart, top pipeline, thesis)
   pipeline/           Full filterable pipeline table
+  sourcing/           Outbound founder discovery and activation
   founders/[id]/      Founder profile (radar chart, dimensions, signals)
   opportunities/[id]/memo   Streaming investment memo generator
   intake/             Founder application form
@@ -66,10 +67,12 @@ app/
   api/                API routes
 lib/
   intel/              Intelligence layer (scoring, validation, prompts, pipeline)
-  sourcing/           Outbound scanning and activation (planned)
+  sourcing/           Outbound scanning and activation
   contracts.ts        Shared Zod schemas between all stages
   llm.ts              Single LLM wrapper with caching + reasoning log
 prisma/
-  schema.prisma       Database schema (13 models, 9 enums)
-brain/                Internal documentation and planning
+  schema.prisma       Database schema (14 models, 11 enums)
+docs/
+  research/           Founder predictor research
+scripts/              Operational tooling (batch scoring, corpus enrichment)
 ```
