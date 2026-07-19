@@ -21,7 +21,7 @@ Part of [[main]] · details in [[data-model]] and [[intelligence-layer]].
 
 ```mermaid
 flowchart TD
-    A[Signal in: inbound application OR outbound scan] --> B[1. Extract claims - Track A]
+    A[Signal in - inbound application OR outbound scan] --> B[1. Extract claims - Track A]
     B --> C[2. Entity resolve via Identity table]
     C --> D[3. First-pass screen - permissive]
     D -->|reject| X[Stop: spam/incoherent only]
