@@ -87,12 +87,13 @@ async function scoreOne(c: Candidate, thesis: ReturnType<typeof thesisConfigFrom
     return { c, screened: true as const };
   }
 
-  await saveFounderScore(c.founderId, result.founderScore!, result.ambition);
+  if (!result.founderScore) throw new Error("no founder score produced");
+  await saveFounderScore(c.founderId, result.founderScore, result.ambition);
   await Promise.all([
     applyValidations(result.validations),
-    saveAxisScores(c.opportunityId, result.axes!),
-    savePlaybook(c.founderId, c.opportunityId, result.playbook!),
-    saveMemo(c.opportunityId, result.memo!),
+    result.axes ? saveAxisScores(c.opportunityId, result.axes) : Promise.resolve(),
+    result.playbook ? savePlaybook(c.founderId, c.opportunityId, result.playbook) : Promise.resolve(),
+    result.memo ? saveMemo(c.opportunityId, result.memo) : Promise.resolve(),
   ]);
 
   const s = result.founderScore!.snapshot;
