@@ -306,6 +306,7 @@ function FounderCard({
 function SourcingContent() {
   const [founders, setFounders] = useState<Founder[]>([]);
   const [stats, setStats] = useState<SourcingStats | null>(null);
+  const [channels, setChannels] = useState<Array<{ source: string; found: number; drafted: number; converted: number; conversionPct: number; avgCapability: number | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
@@ -320,6 +321,7 @@ function SourcingContent() {
         if (cancelled) return;
         setFounders(data.founders ?? []);
         setStats(data.stats ?? null);
+        setChannels(data.channels ?? []);
         setLoading(false);
 
         if ((data.founders ?? []).length === 0) {
@@ -334,6 +336,7 @@ function SourcingContent() {
             if (cancelled) return;
             setFounders(refreshData.founders ?? []);
             setStats(refreshData.stats ?? null);
+            setChannels(refreshData.channels ?? []);
           } catch (err) {
             console.error("Auto-scan failed:", err);
           } finally {
@@ -487,6 +490,31 @@ function SourcingContent() {
             <div className="stat-label">Converted</div>
           </div>
         </div>
+      )}
+
+      {channels.length > 0 && (
+          <div className="card" style={{ marginTop: "var(--space-4)", marginBottom: "var(--space-4)" }}>
+            <div className="card-kicker">Channel quality — which sources produce quality, not volume</div>
+            <div className="table-wrap">
+              <table className="table" style={{ fontSize: 13 }}>
+                <thead>
+                  <tr><th>Channel</th><th>Found</th><th>Drafted</th><th>Converted</th><th>Conv. rate</th><th>Avg capability</th></tr>
+                </thead>
+                <tbody>
+                  {channels.map((c) => (
+                    <tr key={c.source}>
+                      <td><span className="tag tag-neutral">{c.source}</span></td>
+                      <td>{c.found}</td>
+                      <td>{c.drafted}</td>
+                      <td>{c.converted > 0 ? <strong>{c.converted}</strong> : 0}</td>
+                      <td>{c.conversionPct}%</td>
+                      <td>{c.avgCapability ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
       )}
 
       {founders.length === 0 ? (
