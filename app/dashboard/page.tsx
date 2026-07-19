@@ -112,7 +112,7 @@ export default function DashboardPage() {
 
   return (
     <AppLayout>
-      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200 }}>
+      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1440, margin: "0 auto" }}>
         {/* Header */}
         <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-4)" }}>
           <h2 style={{ margin: 0 }}>Dashboard</h2>

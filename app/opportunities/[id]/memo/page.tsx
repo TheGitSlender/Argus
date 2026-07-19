@@ -40,10 +40,9 @@ export default function MemoPage() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch("/api/opportunities");
-        const opps = await res.json();
-        const found = (opps as OpportunityData[]).find((o) => o.id === id);
-        if (found) {
+        const res = await fetch(`/api/opportunities/${id}/memo`);
+        const found = (await res.json()) as OpportunityData | null;
+        if (found && !("error" in (found as object))) {
           setOpp(found);
           if (found.memo) {
             setDone(true);
@@ -169,7 +168,7 @@ export default function MemoPage() {
 
   return (
     <AppLayout>
-      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200 }}>
+      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200, margin: "0 auto" }}>
         {/* Breadcrumb */}
         <div className="text-muted" style={{ fontSize: 12, marginBottom: "var(--space-2)" }}>
           <Link href="/dashboard" style={{ color: "inherit" }}>Dashboard</Link>

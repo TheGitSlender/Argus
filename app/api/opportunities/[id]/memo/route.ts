@@ -21,6 +21,21 @@ const openai = createOpenAI({
   baseURL: process.env.OPENAI_BASE_URL || undefined,
 });
 
+
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const opportunity = await prisma.opportunity.findUnique({
+    where: { id },
+    include: {
+      company: true,
+      axisScores: { orderBy: { createdAt: "desc" } },
+      founders: { include: { founder: { include: { score: true } } } },
+    },
+  });
+  if (!opportunity) return Response.json({ error: "Not found" }, { status: 404 });
+  return Response.json(opportunity);
+}
+
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const inputs = await loadMemoInputs(id);

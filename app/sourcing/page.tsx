@@ -402,7 +402,7 @@ function SourcingContent() {
   }
 
   return (
-    <div style={{ padding: "var(--space-6)", maxWidth: 900 }}>
+    <div style={{ padding: "var(--space-6)", maxWidth: 1200, margin: "0 auto" }}>
       <div
         style={{
           display: "flex",

@@ -70,7 +70,7 @@ export default function PipelinePage() {
     load();
   }, []);
 
-  const sectors = founders ? ["All", ...new Set(founders.map((f) => f.sector))] : ["All"];
+  const sectors = founders ? ["All", ...[...new Set(founders.map((f) => f.sector))].sort()] : ["All"];
   const tracks = ["All", "Inbound", "Outbound"];
 
   const filtered = founders
@@ -83,7 +83,7 @@ export default function PipelinePage() {
 
   return (
     <AppLayout>
-      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200 }}>
+      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1440, margin: "0 auto" }}>
         <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-4)" }}>
           <div>
             <h2 style={{ margin: 0 }}>Pipeline</h2>
@@ -102,22 +102,22 @@ export default function PipelinePage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <div className="seg">
-            {sectors.map((s) => (
-              <label key={s} className="seg-opt">
-                <input type="radio" name="sector" checked={sector === s} onChange={() => setSector(s)} />
-                {s}
-              </label>
-            ))}
-          </div>
-          <div className="seg">
-            {tracks.map((t) => (
-              <label key={t} className="seg-opt">
-                <input type="radio" name="track" checked={track === t} onChange={() => setTrack(t)} />
-                {t}
-              </label>
-            ))}
-          </div>
+          <label className="text-muted" style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+            Sector
+            <select className="input" style={{ width: "auto", minWidth: 150 }} value={sector} onChange={(e) => setSector(e.target.value)}>
+              {sectors.map((s) => (
+                <option key={s} value={s}>{s === "—" ? "(none)" : s}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-muted" style={{ fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
+            Track
+            <select className="input" style={{ width: "auto", minWidth: 120 }} value={track} onChange={(e) => setTrack(e.target.value)}>
+              {tracks.map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {/* Table */}

@@ -73,7 +73,7 @@ export default function IntakePage() {
   if (submitted) {
     return (
       <AppLayout>
-        <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 640 }}>
+        <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 640, margin: "0 auto" }}>
           <div className="card" style={{ padding: "var(--space-6)", textAlign: "center" }}>
             <div className="card-kicker" style={{ fontSize: 14, marginBottom: "var(--space-2)" }}>Application received</div>
             <p style={{ fontSize: 16, marginBottom: "var(--space-4)" }}>
@@ -99,7 +99,7 @@ export default function IntakePage() {
 
   return (
     <AppLayout>
-      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 640 }}>
+      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 640, margin: "0 auto" }}>
         <h2 style={{ margin: "0 0 var(--space-1)" }}>Intake</h2>
         <p className="text-muted" style={{ marginBottom: "var(--space-4)" }}>
           Submit a founder for review. All fields marked with * are required.

@@ -88,7 +88,7 @@ export default function SettingsPage() {
 
   return (
     <AppLayout>
-      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 720 }}>
+      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 720, margin: "0 auto" }}>
         <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-4)" }}>
           <div>
             <h2 style={{ margin: 0 }}>Settings</h2>

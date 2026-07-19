@@ -85,7 +85,7 @@ export default function FounderProfilePage() {
   if (!founder) {
     return (
       <AppLayout>
-        <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200 }}>
+        <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200, margin: "0 auto" }}>
           <div className="card" style={{ height: 200, opacity: 0.4 }} />
         </div>
       </AppLayout>
@@ -132,7 +132,7 @@ export default function FounderProfilePage() {
 
   return (
     <AppLayout>
-      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200 }}>
+      <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200, margin: "0 auto" }}>
         {/* Breadcrumb */}
         <div className="text-muted" style={{ fontSize: 12, marginBottom: "var(--space-2)" }}>
           <Link href="/dashboard" style={{ color: "inherit" }}>Dashboard</Link>
