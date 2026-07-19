@@ -125,6 +125,21 @@ export const validationResultSchema = z.object({
 });
 export type ValidationResult = z.infer<typeof validationResultSchema>;
 
+// ---- Stage 7: adversarial pass (structured) ---------------------------------
+
+export const adversarialBulletSchema = z.object({
+  point: z.string(),
+  severity: z.enum(["high", "medium", "low"]),
+  evidenceRefs: z.array(z.string()),
+});
+export type AdversarialBullet = z.infer<typeof adversarialBulletSchema>;
+
+export const adversarialOutputSchema = z.object({
+  bullets: z.array(adversarialBulletSchema).min(2).max(6),
+  summary: z.string(),
+});
+export type AdversarialOutput = z.infer<typeof adversarialOutputSchema>;
+
 // ---- Stage 8: interview playbook --------------------------------------------
 
 export const interviewQuestionOutputSchema = z.object({

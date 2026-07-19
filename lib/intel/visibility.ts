@@ -41,7 +41,8 @@ const NUMBER_TOKEN = `(\\d[\\d,.]*[km]?|${Object.keys(WORD_NUMBERS).join("|")})`
 function parseNumberToken(token: string): number {
   const word = WORD_NUMBERS[token.toLowerCase()];
   if (word !== undefined) return word;
-  const multiplier = token.endsWith("k") ? 1_000 : token.endsWith("m") ? 1_000_000 : 1;
+  const lower = token.toLowerCase();
+  const multiplier = lower.endsWith("k") ? 1_000 : lower.endsWith("m") ? 1_000_000 : 1;
   return parseFloat(token.replace(/,/g, "")) * multiplier;
 }
 

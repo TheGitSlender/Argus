@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { memoStreamSchema, type MemoDocument } from "@/lib/contracts";
 import { MODELS } from "@/lib/llm";
 import { renderBandSummary } from "@/lib/intel/founder-score";
-import { adversarialPass, renderAmbitionSummary } from "@/lib/intel/memo";
+import { adversarialPass, renderAdversarialBullets, renderAmbitionSummary } from "@/lib/intel/memo";
 import { renderEvidence } from "@/lib/intel/evidence";
 import { MEMO_SYSTEM, memoContext } from "@/lib/intel/prompts";
 import { ambitionReadSchema } from "@/lib/contracts";
@@ -27,7 +27,14 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const bandSummary = renderBandSummary(inputs.snapshot);
   const evidence = renderEvidence(inputs.bundle);
 
-  const bearCase = await adversarialPass(bandSummary, inputs.bundle);
+  let bearCase: string;
+  try {
+    const adversarial = await adversarialPass(bandSummary, inputs.bundle);
+    bearCase = renderAdversarialBullets(adversarial);
+  } catch (err) {
+    console.warn(`[memo-stream] adversarial pass failed for ${id}, using placeholder:`, err);
+    bearCase = "Adversarial analysis unavailable — this section was skipped due to a processing error.";
+  }
 
   const axisSummary = [...inputs.axisRows.values()]
     .map((a) => `- ${a.axis}: ${a.value} (${a.trend.toLowerCase()}) — ${a.rationale}`)
@@ -58,8 +65,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
         ...object,
         optionalSections: Object.fromEntries(object.optionalSections.map((s) => [s.title, s.content])),
         bearCase,
-        signalToDecisionHours:
-          Math.round(((Date.now() - inputs.opportunity.firstSignalAt.getTime()) / 36e5) * 10) / 10,
+        signalToDecisionHours: inputs.opportunity.firstSignalAt
+          ? Math.round(((Date.now() - inputs.opportunity.firstSignalAt.getTime()) / 36e5) * 10) / 10
+          : null,
       };
       await saveMemo(id, memo);
       await prisma.reasoningLog.create({

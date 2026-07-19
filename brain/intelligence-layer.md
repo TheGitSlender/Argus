@@ -26,7 +26,7 @@ Owner: Lead + Claude · branch `track-b-intel` · status in [[tracks/track-b-int
 ## The clever parts
 
 > [!important] Confidence bands via self-consistency
-> Never ask a model "how confident are you" (badly calibrated). Run each dimension **3× at temperature 0.8**; the SPREAD is epistemic uncertainty. `value = median`, band = [min,max] widened by `(1 + 0.5 × (1 - coverage))`, min half-width 3. Coverage = 0.45·signalCount + 0.30·sourceDiversity + 0.25·verifiedShare.
+> Never ask a model "how confident are you" (badly calibrated). Run each dimension **3× at temperature 0.8**; the SPREAD is epistemic uncertainty. `value = median`, band = [min,max] widened by `(1 + 0.5 × (1 - coverage))`, min half-width 3. Coverage = 0.30·signalCount + 0.20·sourceDiversity + 0.20·verifiedShare + 0.15·specificityShare + 0.15·recencyScore (90-day half-life decay).
 
 > [!important] Ambition & Drive read ([[research/founder-predictors]])
 > Idea-agnostic, deliberately softer than the scored dims: ambition level, resourcefulness signals, learning velocity, persistence, **hype risk**, and `ideaAgnosticVerdict` — "would we back this person if this idea died?"
