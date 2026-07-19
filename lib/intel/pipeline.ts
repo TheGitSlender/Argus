@@ -58,12 +58,10 @@ export async function runOpportunityPipeline(
     screen = await screenApplication(bundle);
   } catch (err) {
     logStageFailure("screen", err);
-    errors.push({ stage: "screen", error: extractError(err) });
-    // Can't proceed without a screen verdict — return early with reject.
-    return {
-      screen: { verdict: "reject", reason: `Screen stage failed: ${extractError(err)}` },
-      founderScore: null, ambition: null, axes: null, validations: [], playbook: null, memo: null, errors,
-    };
+    // Never convert an infrastructure failure into a reject verdict — a founder
+    // must not be auto-passed because OpenAI had an outage (the run route
+    // persists PASS on reject). Throw so the caller returns a retryable error.
+    throw new Error(`Screen stage failed (retry the run): ${extractError(err)}`);
   }
 
   if (screen.verdict === "reject") {
