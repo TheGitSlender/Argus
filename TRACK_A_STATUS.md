@@ -2,7 +2,7 @@
 
 ## Current gate
 
-- Gate: 0 — Reproducible foundation
+- Gate: 1 — Synthetic corpus contract and validator
 - State: accepted
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
@@ -34,6 +34,16 @@
 - Existing-file edits require explicit per-file approval.
 - Work cannot advance to Gate 1 until Gate 0 is accepted.
 
+## Gate 1 checklist
+
+- [x] Add a Track A-local Zod corpus contract.
+- [x] Add 36 explicitly synthetic founder profiles with the required archetype distribution.
+- [x] Add exactly 10 synthetic deck signals with slide markers and reference claims.
+- [x] Add corpus-level validation for IDs, ingestion keys, synthetic markers, archetypes, decks, and contradiction pairs.
+- [x] Add tests for valid corpus and critical failure modes.
+- [x] Run validator, tests, lint/type checks, and ownership audit.
+- [x] Present evidence and receive explicit Gate 1 acceptance.
+
 ## Blockers
 
 - None for Gate 0. Adaption and OpenAI credentials remain deferred until their live gates.
@@ -58,3 +68,10 @@
 - Ran the inherited seed unchanged: 4 founders, 1 thesis, 5 signals, 6 claims, 1 ScoreHistory row, and 0 ReasoningLog rows.
 - Confirmed local instance `argus-track-a` is running and no inherited tracked file changed.
 - User accepted Gate 0.
+- Gate 0 committed as `27317ea` by `Aress07` with no co-author metadata.
+- Gate 1 corpus validates: 36 profiles, 10 decks, 40 signals, 54 reference claims, and 4 two-sided contradiction cases.
+- Archetype distribution validates: 8 hidden gems, 6 hype, 6 cold-start, 4 contradiction, 6 research, and 6 balanced profiles.
+- Gate 1 tests: 5 passed, 0 failed, covering canonical validity, Track B score rejection, duplicate ingestion keys, incomplete contradictions, and missing deck slide markers.
+- ESLint and `tsc --noEmit` pass for the new Track A implementation.
+- An unrelated `.gitignore` change adding `.obsidian` appeared during Gate 1 and is preserved unstaged; inherited Markdown files have no content diff despite Windows line-ending status noise.
+- User accepted Gate 1.
