@@ -1,10 +1,15 @@
 // Ranking algorithm for discovered founders. Scores each candidate on thesis
 // fit, CAPABILITY (never popularity), recency, and hidden-gem potential.
 //
-// Iron rule: stars/forks/followers are visibility — they already live in
-// visibilityIndex and may only influence rank NEGATIVELY via the gap bonus.
-// Ranking by them would rebuild the network-gated system this project exists
-// to replace (handoff trap #2).
+// Ordering contract (lead directive):
+//   1. real work + real traction  -> highest (traction claims raise the
+//      composite via Execution/Momentum, which dominates rank at 0-30 pts)
+//   2. real work, no traction yet -> high, slightly under (same capability,
+//      plus up to 10 hidden-gem pts if invisible)
+//   3. hype without work          -> low (thin evidence = low composite;
+//      stars/followers never add rank)
+// Stars are neither a reward nor an exclusion anywhere in sourcing; the
+// early-stage gate lives in discovery (repo age) and the memo decision.
 
 import type { OutreachStatus } from "@prisma/client";
 
@@ -88,7 +93,9 @@ function hiddenGemBonus(
   gap: number | null | undefined,
 ): number {
   if (gap == null) return 0;
-  return Math.min(15, Math.max(0, gap / 4));
+  // Capped at 10 so equal-capability ordering favors demonstrated traction
+  // (in the composite) over invisibility.
+  return Math.min(10, Math.max(0, gap / 4));
 }
 
 /**

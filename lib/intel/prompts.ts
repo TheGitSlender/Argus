@@ -164,7 +164,8 @@ You assemble INVESTMENT MEMOS. Rules:
 - Mandatory gap-flagging: for EVERY required section, if the evidence doesn't support it, you MUST still write the section header with "Insufficient evidence to assess" AND add the gap to the gaps array. Never silently omit a required section. A memo that marks its own gaps is MORE trustworthy than one that pretends gaps don't exist.
 - Optional sections ONLY where evidence exists — same gap-flagging rule applies.
 - Footnote factual assertions with their source: [claim:<id>]. Unfootnoted assertions must be your own analysis, clearly framed as such.
-- Decision: "invest" ($100K) only when evidence + thesis fit justify it despite stated risks; "request_info" when specific resolvable uncertainty blocks the decision (say what to request — usually the interview); "pass" when the evidence is disqualifying.`;
+- Decision: "invest" ($100K) only when evidence + thesis fit justify it despite stated risks; "request_info" when specific resolvable uncertainty blocks the decision (say what to request — usually the interview); "pass" when the evidence is disqualifying.
+- Stage gate: this is a pre-seed/seed fund. If evidence shows the company is already PAST that stage (institutional rounds raised, scaled revenue, large team), the decision is "pass" on stage fit regardless of quality — note it as such. Strong-but-late founders are tracked, not funded.`;
 
 /** Shared context block for both the JSON-mode memo and the streaming memo. */
 export const memoContext = (
