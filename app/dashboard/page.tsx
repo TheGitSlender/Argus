@@ -96,91 +96,125 @@ export default function DashboardPage() {
 
   const top5 = sorted.slice(0, 5);
 
+  const stats = founders
+    ? {
+        total: founders.length,
+        avgScore: founders.length
+          ? Math.round(founders.reduce((s, f) => s + f.founderScore, 0) / founders.length)
+          : 0,
+        hiddenGems: founders.filter((f) => f.capability - f.visibility > 30).length,
+        companies: new Set(founders.map((f) => f.company)).size,
+      }
+    : null;
+
   return (
     <AppLayout>
       <div style={{ padding: "var(--space-4) var(--space-6)", maxWidth: 1200 }}>
         {/* Header */}
         <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-4)" }}>
           <h2 style={{ margin: 0 }}>Dashboard</h2>
-          <div className="flex items-center gap-2">
-            <input
-              className="input"
-              placeholder="Search founders, companies, signals"
-              style={{ maxWidth: 320 }}
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
+          <input
+            className="input"
+            placeholder="Search founders, companies"
+            style={{ maxWidth: 280 }}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
         </div>
 
         {founders === null ? (
-          <div className="flex gap-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="card" style={{ height: 120, opacity: 0.4 }} />
-            ))}
-          </div>
+          <>
+            <div className="dashboard-stats">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="stat-card" style={{ height: 80, opacity: 0.3 }} />
+              ))}
+            </div>
+            <div className="dashboard-grid">
+              <div className="card" style={{ height: 300, opacity: 0.3 }} />
+              <div className="card" style={{ height: 300, opacity: 0.3 }} />
+            </div>
+          </>
         ) : (
           <>
-            {/* Scatter Chart */}
-            <div className="card" style={{ marginBottom: "var(--space-4)" }}>
-              <div className="card-kicker">Capability vs. Visibility</div>
-              <ScatterChart
-                data={founders.map((f) => ({
-                  id: f.id,
-                  name: f.name,
-                  company: f.company,
-                  visibility: f.visibility,
-                  capability: f.capability,
-                }))}
-              />
+            {/* Stats Row */}
+            <div className="dashboard-stats">
+              <div className="stat-card">
+                <div className="stat-value">{stats!.total}</div>
+                <div className="stat-label">Total Founders</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{stats!.avgScore}</div>
+                <div className="stat-label">Avg Score</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{stats!.hiddenGems}</div>
+                <div className="stat-label">Hidden Gems</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-value">{stats!.companies}</div>
+                <div className="stat-label">Companies</div>
+              </div>
             </div>
 
-            {/* Top 5 Pipeline */}
-            <div className="card">
-              <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-2)" }}>
-                <div className="card-kicker">Top Pipeline</div>
-                <Link href="/pipeline" className="btn btn-ghost" style={{ fontSize: 12 }}>View full pipeline</Link>
+            {/* Chart + Pipeline grid */}
+            <div className="dashboard-grid">
+              {/* Scatter Chart */}
+              <div className="card">
+                <div className="card-kicker">Capability vs. Visibility</div>
+                <ScatterChart
+                  data={founders.map((f) => ({
+                    id: f.id,
+                    name: f.name,
+                    company: f.company,
+                    visibility: f.visibility,
+                    capability: f.capability,
+                  }))}
+                />
               </div>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Founder</th>
-                    <th>Sector</th>
-                    <th>Score</th>
-                    <th>Thesis fit</th>
-                    <th>Days</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {top5.map((f) => (
-                    <tr key={f.id}>
-                      <td>
-                        <Link href={`/founders/${f.id}`} style={{ textDecoration: "none", color: "var(--color-text)" }}>
-                          <div style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}>{f.name}</div>
-                          <div className="text-muted" style={{ fontSize: 12 }}>{f.company}</div>
-                        </Link>
-                      </td>
-                      <td><span className="tag tag-neutral">{f.sector}</span></td>
-                      <td>
-                        <ScoreBand value={f.founderScore} low={f.band[0]} high={f.band[1]} size="sm" showLabel={false} />
-                        <span style={{ fontSize: 13, marginLeft: 8 }}>{f.founderScore}</span>
-                      </td>
-                      <td className="text-muted">{f.thesisFit}%</td>
-                      <td className="text-muted">{f.daysInPipeline}d</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {top5.length === 0 && (
-                <div className="text-muted" style={{ padding: "var(--space-4)", textAlign: "center" }}>
-                  No founders in pipeline yet.
+
+              {/* Top 5 Pipeline */}
+              <div className="card">
+                <div className="flex items-center justify-between" style={{ marginBottom: "var(--space-2)" }}>
+                  <div className="card-kicker">Top Pipeline</div>
+                  <Link href="/pipeline" className="btn btn-ghost" style={{ fontSize: 12 }}>View all</Link>
                 </div>
-              )}
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Founder</th>
+                      <th>Score</th>
+                      <th>Days</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {top5.map((f) => (
+                      <tr key={f.id}>
+                        <td>
+                          <Link href={`/founders/${f.id}`} style={{ textDecoration: "none", color: "var(--color-text)" }}>
+                            <div style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}>{f.name}</div>
+                            <div className="text-muted" style={{ fontSize: 12 }}>{f.company}</div>
+                          </Link>
+                        </td>
+                        <td>
+                          <ScoreBand value={f.founderScore} low={f.band[0]} high={f.band[1]} size="sm" showLabel={false} />
+                          <span style={{ fontSize: 13, marginLeft: 8 }}>{f.founderScore}</span>
+                        </td>
+                        <td className="text-muted">{f.daysInPipeline}d</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {top5.length === 0 && (
+                  <div className="text-muted" style={{ padding: "var(--space-4)", textAlign: "center" }}>
+                    No founders in pipeline yet.
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Thesis Panel */}
             {thesis && (
-              <div className="card" style={{ marginTop: "var(--space-4)" }}>
+              <div className="card">
                 <div className="card-kicker">Active Thesis</div>
                 <div className="flex gap-4" style={{ flexWrap: "wrap" }}>
                   <div>

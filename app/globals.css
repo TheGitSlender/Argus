@@ -298,6 +298,55 @@ textarea.input { min-height: 90px; resize: vertical; }
 .side-link.active svg { opacity: 1; }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   Dashboard
+   ══════════════════════════════════════════════════════════════════════════ */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+.stat-card {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: var(--space-3); border-radius: var(--radius-md);
+  background: transparent; border: 1px solid var(--color-divider);
+}
+.stat-value {
+  font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 26px; line-height: 1.1; letter-spacing: -0.02em;
+}
+.stat-label {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--color-text) 50%, transparent);
+}
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+.scatter-tooltip {
+  position: absolute;
+  pointer-events: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-divider);
+  box-shadow: var(--shadow-md);
+  font-size: 13px; line-height: 1.4;
+  white-space: nowrap;
+  z-index: 10;
+}
+.scatter-tooltip strong {
+  font-family: var(--font-heading); font-weight: 600;
+  display: block;
+}
+.scatter-tooltip span {
+  font-size: 12px;
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
    Plate (image mat)
    ══════════════════════════════════════════════════════════════════════════ */
 .plate {
