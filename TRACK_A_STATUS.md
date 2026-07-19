@@ -2,7 +2,7 @@
 
 ## Current gate
 
-- Gate: 1 — Synthetic corpus contract and validator
+- Gate: 2 — Idempotent Postgres importer
 - State: accepted
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
@@ -44,6 +44,22 @@
 - [x] Run validator, tests, lint/type checks, and ownership audit.
 - [x] Present evidence and receive explicit Gate 1 acceptance.
 
+## Gate 2 checklist
+
+- [x] Add a standalone importer without modifying package scripts or the inherited seed.
+- [x] Support safe dry-run and explicit apply modes.
+- [x] Import Founder, Company, Opportunity, OpportunityFounder, Identity, Signal, and Claim records only.
+- [x] Reject identity and signal collisions instead of silently reassigning evidence.
+- [x] Preserve append-only ScoreHistory and ReasoningLog tables.
+- [x] Verify first-import counts and second-run zero-duplicate behavior.
+- [x] Run tests, type checks, lint, and ownership audit.
+- [x] Present evidence and receive explicit Gate 2 acceptance.
+
+## Deferred Adaption checklist
+
+- [ ] Configure `ADAPTION_API_KEY` in ignored `.env`.
+- [ ] Run the five-row estimate-first spike and full deck batch after the remaining core Person A functionality is accepted.
+
 ## Blockers
 
 - None for Gate 0. Adaption and OpenAI credentials remain deferred until their live gates.
@@ -75,3 +91,14 @@
 - ESLint and `tsc --noEmit` pass for the new Track A implementation.
 - An unrelated `.gitignore` change adding `.obsidian` appeared during Gate 1 and is preserved unstaged; inherited Markdown files have no content diff despite Windows line-ending status noise.
 - User accepted Gate 1.
+- Gate 1 committed as `100cb28` by `Aress07` with no co-author metadata.
+- User deferred all Adaption work until the remaining core Person A functionality is complete.
+- Gate 2 dry-run planned exactly 36 founders, 36 companies, 36 opportunities, 36 founder links, 30 identities, 40 signals, and 54 claims.
+- The initial interactive-transaction import stopped local PGlite after 19 profiles; protected tables were unchanged and the idempotent importer correctly recognized the partial state.
+- Replaced the unsupported long interactive transaction with serial collision-checked operations and resumed safely.
+- Final idempotence run created zero rows and reused every expected corpus record.
+- Database totals now include baseline plus corpus: 40 founders, 38 companies, 38 opportunities, 38 founder links, 31 identities, 45 signals, and 60 claims.
+- Verified hidden-gem, cold-start, and contradiction evidence chains through Founder → Opportunity/Identity → Signal → Claim.
+- `ScoreHistory` remains 1 and `ReasoningLog` remains 0.
+- Gate 1 + Gate 2 tests: 10 passed, 0 failed; ESLint and `tsc --noEmit` pass.
+- User accepted Gate 2.
