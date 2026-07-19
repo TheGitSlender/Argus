@@ -76,7 +76,9 @@ export function renderEvidence(bundle: EvidenceBundle): string {
   if (signals.length === 0) lines.push("- (none)");
   for (const s of signals) {
     const when = s.occurredAt ? ` | ${s.occurredAt.toISOString().slice(0, 10)}` : "";
-    lines.push(`- [signal:${s.id}] source=${s.source}${when}${s.sourceUrl ? ` | ${s.sourceUrl}` : ""}`);
+    // Corpus URLs use a synthetic:// scheme — bookkeeping, not evidence; hide them.
+    const displayUrl = s.sourceUrl && !s.sourceUrl.startsWith("synthetic://") ? ` | ${s.sourceUrl}` : "";
+    lines.push(`- [signal:${s.id}] source=${s.source}${when}${displayUrl}`);
     const content = sanitizeContent(s.rawContent.replaceAll("\n", " "));
     const truncated = content.length > 1200;
     lines.push(`  ${truncated ? content.slice(0, 1200) + " [truncated]" : content}`);
