@@ -76,13 +76,42 @@ export function renderEvidence(bundle: EvidenceBundle): string {
 /**
  * Evidence coverage 0-1: how much the evidence can support a confident score.
  * Drives band widening — few signals / single source / unverified claims widen.
+ *
+ * Components:
+ *   0.30 · signalCount     (saturates at 5 signals)
+ *   0.20 · sourceDiversity  (saturates at 4 distinct sources)
+ *   0.20 · verifiedShare    (share of claims with VERIFIED status)
+ *   0.15 · specificityShare (share of high-specificity claims)
+ *   0.15 · recencyScore     (avg age-decay of signals, 90-day half-life)
+ *
+ * Minimum evidence floor: <2 signals → cap at 0.15 (wide bands mandatory).
  */
 export function computeCoverage(bundle: EvidenceBundle): number {
+  if (bundle.signals.length < 2) return Math.min(0.15, computeRawCoverage(bundle));
+  return Math.round(computeRawCoverage(bundle) * 100) / 100;
+}
+
+function computeRawCoverage(bundle: EvidenceBundle): number {
   const signalCount = Math.min(bundle.signals.length / 5, 1);
   const distinctSources = new Set(bundle.signals.map((s) => s.source)).size;
   const diversity = Math.min(distinctSources / 4, 1);
+
   const verified = bundle.claims.filter((c) => c.verificationStatus === "VERIFIED").length;
   const verifiedShare = bundle.claims.length > 0 ? verified / bundle.claims.length : 0;
-  const coverage = 0.45 * signalCount + 0.3 * diversity + 0.25 * verifiedShare;
-  return Math.round(coverage * 100) / 100;
+
+  const highSpec = bundle.claims.filter((c) => c.specificity === "high").length;
+  const specificityShare = bundle.claims.length > 0 ? highSpec / bundle.claims.length : 0;
+
+  const now = Date.now();
+  const DAY_MS = 86_400_000;
+  const recencyScores = bundle.signals.map((s) => {
+    if (!s.occurredAt) return 0.33; // unknown date → neutral midpoint
+    const daysAgo = Math.max(0, (now - s.occurredAt.getTime()) / DAY_MS);
+    return Math.max(0, 1 - daysAgo / 90);
+  });
+  const recencyScore = recencyScores.length > 0
+    ? recencyScores.reduce((a, b) => a + b, 0) / recencyScores.length
+    : 0;
+
+  return 0.30 * signalCount + 0.20 * diversity + 0.20 * verifiedShare + 0.15 * specificityShare + 0.15 * recencyScore;
 }

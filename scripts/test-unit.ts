@@ -255,7 +255,7 @@ hr("parseVisibilityFromText");
 // evidence.ts — computeCoverage
 // =============================================================================
 
-hr("computeCoverage");
+hr("computeCoverage — minimum evidence floor");
 
 {
   const bundle: EvidenceBundle = {
@@ -274,27 +274,34 @@ hr("computeCoverage");
     ],
     claims: [],
   };
-  approxEqual(computeCoverage(bundle), 0.17, 0.01, "1 signal, 1 source, 0 verified → ≈0.17");
+  assert(computeCoverage(bundle) <= 0.15, "1 signal → capped at 0.15", `got ${computeCoverage(bundle)}`);
 }
 
+hr("computeCoverage — full formula");
+
 {
+  const now = Date.now();
+  const DAY_MS = 86_400_000;
+  const recent = new Date(now - 3 * DAY_MS); // 3 days ago → recency ≈ 0.967
   const bundle: EvidenceBundle = {
     founder: { name: "Test", context: { teamStatus: "solo", occupation: "unknown", priorFunding: "none known" } },
     signals: [
-      { id: "s1", source: "GITHUB", rawContent: "test" },
-      { id: "s2", source: "BLOG", rawContent: "test" },
-      { id: "s3", source: "WEB", rawContent: "test" },
-      { id: "s4", source: "ARXIV", rawContent: "test" },
-      { id: "s5", source: "PRODUCT_HUNT", rawContent: "test" },
+      { id: "s1", source: "GITHUB", rawContent: "test", occurredAt: recent },
+      { id: "s2", source: "BLOG", rawContent: "test", occurredAt: recent },
+      { id: "s3", source: "WEB", rawContent: "test", occurredAt: recent },
+      { id: "s4", source: "ARXIV", rawContent: "test", occurredAt: recent },
+      { id: "s5", source: "PRODUCT_HUNT", rawContent: "test", occurredAt: recent },
     ],
     claims: [
-      { id: "c1", text: "claim", category: "traction", verificationStatus: "VERIFIED" },
-      { id: "c2", text: "claim", category: "team", verificationStatus: "VERIFIED" },
-      { id: "c3", text: "claim", category: "market", verificationStatus: "VERIFIED" },
-      { id: "c4", text: "claim", category: "revenue", verificationStatus: "UNVERIFIED" },
+      { id: "c1", text: "claim", category: "traction", verificationStatus: "VERIFIED", specificity: "high" },
+      { id: "c2", text: "claim", category: "team", verificationStatus: "VERIFIED", specificity: "high" },
+      { id: "c3", text: "claim", category: "market", verificationStatus: "VERIFIED", specificity: "high" },
+      { id: "c4", text: "claim", category: "revenue", verificationStatus: "UNVERIFIED", specificity: "low" },
     ],
   };
-  approxEqual(computeCoverage(bundle), 0.94, 0.01, "5 signals, 4 sources, 3/4 verified → ≈0.94");
+  // signalCount=1, diversity=1, verified=0.75, specificity=0.75, recency≈0.967
+  // 0.30 + 0.20 + 0.15 + 0.1125 + 0.145 ≈ 0.91
+  approxEqual(computeCoverage(bundle), 0.91, 0.02, "5 signals, 4 sources, 3/4 verified, 3/4 high-spec, recent → ≈0.91");
 }
 
 {
@@ -309,7 +316,49 @@ hr("computeCoverage");
     ],
     claims: [],
   };
-  approxEqual(computeCoverage(bundle), 0.53, 0.01, "5 signals, 1 source, 0 verified → ≈0.53");
+  // signalCount=1, diversity=0.25, verified=0, specificity=0, recency=0.33
+  // 0.30 + 0.05 + 0 + 0 + 0.05 ≈ 0.40
+  approxEqual(computeCoverage(bundle), 0.40, 0.02, "5 signals, 1 source, 0 verified, no dates → ≈0.40");
+}
+
+hr("computeCoverage — recency decay");
+
+{
+  const now = Date.now();
+  const DAY_MS = 86_400_000;
+  const oldDate = new Date(now - 180 * DAY_MS); // 6 months ago → recency = 0
+  const recentDate = new Date(now - 3 * DAY_MS); // 3 days ago → recency ≈ 0.967
+
+  const makeBundle = (dates: Date[]): EvidenceBundle => ({
+    founder: { name: "Test", context: { teamStatus: "solo", occupation: "unknown", priorFunding: "none known" } },
+    signals: dates.map((d, i) => ({ id: `s${i}`, source: "GITHUB", rawContent: "test", occurredAt: d })),
+    claims: [],
+  });
+
+  const oldCoverage = computeCoverage(makeBundle([oldDate, oldDate, oldDate]));
+  const recentCoverage = computeCoverage(makeBundle([recentDate, recentDate, recentDate]));
+  assert(recentCoverage > oldCoverage, "recent signals → higher coverage than old signals",
+    `recent=${recentCoverage} old=${oldCoverage}`);
+}
+
+hr("computeCoverage — specificity boost");
+
+{
+  const now = Date.now();
+  const recent = new Date(now - 3 * 86_400_000);
+  const makeBundle = (specs: Array<"high" | "medium" | "low" | null>): EvidenceBundle => ({
+    founder: { name: "Test", context: { teamStatus: "solo", occupation: "unknown", priorFunding: "none known" } },
+    signals: [
+      { id: "s1", source: "GITHUB", rawContent: "test", occurredAt: recent },
+      { id: "s2", source: "BLOG", rawContent: "test", occurredAt: recent },
+    ],
+    claims: specs.map((s, i) => ({ id: `c${i}`, text: "claim", category: "other", specificity: s })),
+  });
+
+  const lowSpecCoverage = computeCoverage(makeBundle(["low", "low"]));
+  const highSpecCoverage = computeCoverage(makeBundle(["high", "high"]));
+  assert(highSpecCoverage > lowSpecCoverage, "high-spec claims → higher coverage",
+    `high=${highSpecCoverage} low=${lowSpecCoverage}`);
 }
 
 // =============================================================================
