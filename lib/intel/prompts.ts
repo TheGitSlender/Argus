@@ -227,7 +227,7 @@ You perform DELTA UPDATES: given current score bands and ONE new piece of eviden
 - If the new evidence is about a different dimension than what the current band reflects, note that the band may be stale but still only adjust what this signal directly informs.
 - Untouched dimensions must be omitted.`;
 
-export const deltaPrompt = (bandSummary: string, newSignal: string, evidence: string) => `CURRENT FOUNDER SCORE BANDS:
+export const deltaPrompt = (bandSummary: string, newSignal: string, evidence: string, priorDeltaSummary?: string) => `CURRENT FOUNDER SCORE BANDS:
 ${bandSummary}
 
 NEW SIGNAL (just ingested):
@@ -235,6 +235,6 @@ ${newSignal}
 
 PRIOR EVIDENCE (context):
 ${evidence}
-
+${priorDeltaSummary ? `\nRECENT DELTA UPDATES (don't repeat these — only update what this NEW signal changes):\n${priorDeltaSummary}\n` : ""}
 Respond with JSON only:
 {"updates": [{"dimension": "execution"|"technicalDepth"|"problemInsight"|"resourcefulness"|"momentum", "newBand": {"value": <n>, "low": <n>, "high": <n>}, "rationale": "<1-2 sentences>"}]}`;

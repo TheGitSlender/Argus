@@ -161,14 +161,15 @@ export async function generatePlaybook(
 export async function deltaUpdate(
   bandSummary: string,
   newSignal: EvidenceSignal,
-  bundle: EvidenceBundle
+  bundle: EvidenceBundle,
+  priorDeltaSummary?: string
 ): Promise<DeltaUpdateOutput> {
   const signalLine = `[signal:${newSignal.id}] source=${newSignal.source} ${newSignal.rawContent}`;
   const r = await runLLM({
     step: "delta_update",
     model: MODELS.score,
     system: DELTA_SYSTEM,
-    prompt: deltaPrompt(bandSummary, signalLine, renderEvidence(bundle)),
+    prompt: deltaPrompt(bandSummary, signalLine, renderEvidence(bundle), priorDeltaSummary),
     schema: deltaUpdateOutputSchema,
     inputRefs: { founderId: bundle.founder.id ?? null, causeSignalId: newSignal.id },
   });

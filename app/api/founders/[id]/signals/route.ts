@@ -57,10 +57,22 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
     const bundle = await assembleBundle(id);
+
+    // Fetch recent delta history to prevent redundant adjustments.
+    const recentHistory = await prisma.scoreHistory.findMany({
+      where: { founderId: id },
+      orderBy: { createdAt: "desc" },
+      take: 3,
+    });
+    const priorDeltaSummary = recentHistory.length > 0
+      ? recentHistory.map((h) => `${h.dimension}: ${JSON.stringify(h.newBand)} (${h.rationale})`).join("\n")
+      : undefined;
+
     const delta = await deltaUpdate(
       renderBandSummary(snapshotFromDb(scoreRow)),
       { id: signal.id, source: signal.source, rawContent: signal.rawContent, occurredAt: signal.occurredAt },
-      bundle
+      bundle,
+      priorDeltaSummary
     );
     const snapshot = delta.updates.length > 0 ? await applyDeltaUpdates(id, delta, signal.id) : snapshotFromDb(scoreRow);
 
