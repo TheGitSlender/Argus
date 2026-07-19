@@ -64,6 +64,18 @@ function cacheKeyFor(parts: unknown): string {
   return createHash("sha256").update(JSON.stringify(parts)).digest("hex");
 }
 
+// Until the shared Postgres exists, cache lookups and ReasoningLog writes are
+// skipped with a single warning instead of failing the whole pipeline.
+let dbWarned = false;
+function warnDbOnce(err: unknown) {
+  if (!dbWarned) {
+    dbWarned = true;
+    console.warn(
+      `[llm] ReasoningLog unavailable (no DATABASE_URL yet?) — running uncached & unlogged. ${String(err).split("\n")[0]}`
+    );
+  }
+}
+
 function extractJson(text: string): string {
   // Tolerate code fences and leading prose from weaker models.
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -116,15 +128,19 @@ export async function runLLM<T = string>(opts: RunLlmOptions<T>): Promise<LlmRes
   });
 
   if (!opts.noCache) {
-    const hit = await prisma.reasoningLog.findFirst({
-      where: { cacheKey: key },
-      orderBy: { createdAt: "desc" },
-    });
-    if (hit) {
-      const parsed = opts.schema
-        ? opts.schema.parse(JSON.parse(extractJson(hit.output)))
-        : (hit.output as unknown as T);
-      return { text: hit.output, parsed, cached: true, model };
+    try {
+      const hit = await prisma.reasoningLog.findFirst({
+        where: { cacheKey: key },
+        orderBy: { createdAt: "desc" },
+      });
+      if (hit) {
+        const parsed = opts.schema
+          ? opts.schema.parse(JSON.parse(extractJson(hit.output)))
+          : (hit.output as unknown as T);
+        return { text: hit.output, parsed, cached: true, model };
+      }
+    } catch (err) {
+      warnDbOnce(err);
     }
   }
 
@@ -146,18 +162,22 @@ export async function runLLM<T = string>(opts: RunLlmOptions<T>): Promise<LlmRes
     parsed = attempt.text as unknown as T;
   }
 
-  await prisma.reasoningLog.create({
-    data: {
-      step: opts.step,
-      model,
-      cacheKey: key,
-      inputRefs: (opts.inputRefs ?? {}) as object,
-      output: attempt.text,
-      inputTokens: attempt.inputTokens,
-      outputTokens: attempt.outputTokens,
-      latencyMs: attempt.latencyMs,
-    },
-  });
+  try {
+    await prisma.reasoningLog.create({
+      data: {
+        step: opts.step,
+        model,
+        cacheKey: key,
+        inputRefs: (opts.inputRefs ?? {}) as object,
+        output: attempt.text,
+        inputTokens: attempt.inputTokens,
+        outputTokens: attempt.outputTokens,
+        latencyMs: attempt.latencyMs,
+      },
+    });
+  } catch (err) {
+    warnDbOnce(err);
+  }
 
   return { text: attempt.text, parsed, cached: false, model };
 }

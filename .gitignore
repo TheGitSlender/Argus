@@ -30,6 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# obsidian per-user workspace config (the vault itself IS committed)
+brain/.obsidian/
+
 # env files (can opt-in for committing if needed)
 .env*
 !.env.example
