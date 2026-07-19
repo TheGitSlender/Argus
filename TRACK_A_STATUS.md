@@ -2,8 +2,8 @@
 
 ## Current gate
 
-- Gate: 4 — Local deck extraction and runtime claim extraction
-- State: accepted, committed, and pushed; Gate 5 not started
+- Gate: 5 — Handoff and freeze
+- State: accepted; ready to commit
 - Branch: `track-a-data`
 - Git author: `Aress07 <taha.mahha21@gmail.com>`
 
@@ -90,8 +90,19 @@
 
 ## Blockers
 
-- None for Gate 4.
+- None for Gate 5.
 - Adaption remains explicitly deferred by the user.
+
+## Gate 5 checklist
+
+- [x] Add a deterministic handoff verifier for hidden-gem, cold-start, contradiction, and persistent-identity cases.
+- [x] Document corpus shape, importer order, entity thresholds, runtime extraction, commands, and current counts.
+- [x] Record Adaption as deferred with zero spend and no fabricated evaluation result.
+- [x] Document known gaps, ownership boundaries, and the exact clean-rebuild procedure.
+- [x] Rebuild Track A in a separate clean local database without touching the working database.
+- [x] Query and validate all four demonstration cases from that clean database.
+- [x] Run all validators, tests, database checks, lint, type checks, and production build.
+- [x] Present evidence and receive explicit Gate 5 acceptance before committing or pushing.
 
 ## Evidence log
 
@@ -171,3 +182,18 @@
 - User authorized final verification, documentation, commit, and push to `track-a-data`; Gate 5 remains unstarted.
 - Gate 4 committed as `ed745e0` by `Aress07 <taha.mahha21@gmail.com>` with no co-author or assistant contributor metadata.
 - Pushed merged main history plus accepted Gates 2–4 to `origin/track-a-data`; `origin/main` was not changed.
+- User authorized starting Gate 5; no stretch fetcher or Adaption work has started.
+- Added a stable Gate 5 verifier for `syn-003` hidden gem, `syn-015` cold start, `syn-021` contradiction, and `syn-001` persistent identity.
+- Current-database handoff verification passed with 40 founders, 38 companies/opportunities, 32 identities, 45 Signals, 62 Claims, 1 ScoreHistory, and 1 ReasoningLog.
+- Created separate named local PGlite instance `argus-track-a-gate5`; the primary `argus-track-a` database was not modified by the rebuild.
+- Clean schema push and unchanged baseline seed succeeded.
+- Clean first corpus import created the complete corpus; second import created zero rows and reused every corpus row.
+- Clean first entity apply created 1 and reused 1 exact identity; second created 0 and reused 2 while review/unresolved/conflict cases remained unwritten.
+- Clean runtime extraction created 2 grounded Claims and 1 ReasoningLog; explicit replay returned `cached: true` and created 0 Claims.
+- All four demonstration cases passed against the clean database with final totals matching the working database.
+- Added `TRACK_A_HANDOFF.md` and updated `TRACK_A_TESTING.md`; Adaption is recorded honestly as 0 calls, 0 estimated/spent credits, and no evaluation.
+- Final freeze checks passed: 29 TypeScript tests, 4 PDF tests, corpus validator, importer dry-run, entity dry-run, four-case verifier, `tsc --noEmit`, and Next.js production build.
+- ESLint completed with 0 errors and the single documented inherited `_extra` warning in `lib/intel/prompts.ts`.
+- Stopped only `argus-track-a-gate5` after verification; its named rebuild data remains available while primary `argus-track-a` remains running.
+- Clean-rebuild Groq usage was exactly 1 logged call with 380 input tokens, 574 output tokens, and 1,084 ms latency; replay added no call. Exact monetary charge was not exposed and is not fabricated.
+- User explicitly accepted Gate 5.

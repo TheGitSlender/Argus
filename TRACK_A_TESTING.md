@@ -64,7 +64,7 @@ npm run build
 Expected:
 
 - 4 Python tests pass.
-- 27 TypeScript tests pass.
+- 29 TypeScript tests pass.
 - TypeScript and production build pass.
 - ESLint has zero errors. Main currently has one inherited `_extra` warning in `lib/intel/prompts.ts`.
 
@@ -132,7 +132,15 @@ Open these URLs:
 
 Stop the server with `Ctrl+C` after testing.
 
-## 9. Final safety check
+## 9. Verify the four handoff cases
+
+```powershell
+npx tsx .\scripts\track-a\verify-handoff.ts
+```
+
+Expected cases: hidden gem `syn-003`, cold start `syn-015`, contradiction `syn-021`, and persistent identity `syn-001`. The command is read-only and must leave protected counts unchanged.
+
+## 10. Final safety check
 
 ```powershell
 git diff --check
@@ -140,3 +148,5 @@ git status --short --branch
 ```
 
 Track A commands must never update or delete `ScoreHistory` or `ReasoningLog`. The only expected ReasoningLog change is an append from a genuinely uncached `runLLM()` call.
+
+For a complete clean-database rebuild, follow `TRACK_A_HANDOFF.md` in exact order.
