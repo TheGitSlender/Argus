@@ -45,7 +45,7 @@ export default function RadarChart({ dimensions, size = 240 }: RadarChartProps) 
   const highPolygon = buildPolygon((d) => d.high);
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} style={{ width: size, height: size }}>
+    <svg viewBox={`0 0 ${size} ${size}`} style={{ width: "100%", height: "auto", maxWidth: size }}>
       {/* Grid levels */}
       {Array.from({ length: levels }, (_, i) => {
         const r = ((i + 1) / levels) * maxR;
