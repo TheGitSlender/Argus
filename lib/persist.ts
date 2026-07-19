@@ -17,7 +17,7 @@ import {
 import type { EvidenceBundle } from "./intel/evidence";
 import type { FounderScoreResult } from "./intel/founder-score";
 import type { AxisSet } from "./intel/memo";
-import { compositeBand } from "./intel/band-math";
+import { compositeBand, medianIndex } from "./intel/band-math";
 
 // =============================================================================
 // Persistence: the only place where intelligence results touch Prisma.
@@ -119,14 +119,20 @@ export async function saveFounderScore(
     update: fields,
   });
   await prisma.scoreHistory.createMany({
-    data: DIMENSION_KEYS.map((dim) => ({
-      founderId,
-      dimension: DIM_TO_ENUM[dim],
-      oldBand: prev ? (prev[dim] as object) : undefined,
-      newBand: s[dim],
-      causeSignalId: causeSignalId ?? null,
-      rationale: result.dimensions[dim].samples[0]?.rationale ?? "scored from full evidence bundle",
-    })),
+    data: DIMENSION_KEYS.map((dim) => {
+      const band = s[dim];
+      const idx = medianIndex(band);
+      const position = idx < 0.4 ? "lower end" : idx > 0.6 ? "upper end" : "centred";
+      const base = result.dimensions[dim].samples[0]?.rationale ?? "scored from full evidence bundle";
+      return {
+        founderId,
+        dimension: DIM_TO_ENUM[dim],
+        oldBand: prev ? (prev[dim] as object) : undefined,
+        newBand: band,
+        causeSignalId: causeSignalId ?? null,
+        rationale: `${base} [band position: ${position} (${idx.toFixed(2)})]`,
+      };
+    }),
   });
 }
 

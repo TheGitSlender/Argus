@@ -50,3 +50,15 @@ export function compositeBand(bands: ScoreBand[]): ScoreBand {
 export function bandWidth(b: ScoreBand): number {
   return b.high - b.low;
 }
+
+/**
+ * Where the point estimate sits within the band: 0 = at low edge,
+ * 0.5 = centred, 1 = at high edge.  Useful for distinguishing "we're
+ * confident this is high" from "we're uncertain and the median happens
+ * to be high."
+ */
+export function medianIndex(b: ScoreBand): number {
+  const w = b.high - b.low;
+  if (w === 0) return 0.5;
+  return Math.round(((b.value - b.low) / w) * 100) / 100;
+}

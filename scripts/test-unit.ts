@@ -2,7 +2,7 @@
  * Unit tests for pure-logic intelligence functions. No DB, no LLM, $0 cost.
  * Run: npm run test:unit
  */
-import { median, bandFromSamples, compositeBand, bandWidth } from "../lib/intel/band-math";
+import { median, bandFromSamples, compositeBand, bandWidth, medianIndex } from "../lib/intel/band-math";
 import { computeVisibilityIndex, parseVisibilityFromText } from "../lib/intel/visibility";
 import { computeCoverage, type EvidenceBundle } from "../lib/intel/evidence";
 
@@ -146,6 +146,13 @@ hr("bandWidth");
 assert(bandWidth({ value: 70, low: 60, high: 80 }) === 20, "basic width");
 assert(bandWidth({ value: 50, low: 50, high: 50 }) === 0, "zero width");
 assert(bandWidth({ value: 70, low: 0, high: 100 }) === 100, "full range");
+
+hr("medianIndex");
+
+approxEqual(medianIndex({ value: 50, low: 0, high: 100, coverage: 0.5 }), 0.50, 0.01, "centred → 0.50");
+approxEqual(medianIndex({ value: 25, low: 0, high: 100, coverage: 0.5 }), 0.25, 0.01, "lower end → 0.25");
+approxEqual(medianIndex({ value: 80, low: 0, high: 100, coverage: 0.5 }), 0.80, 0.01, "upper end → 0.80");
+assert(medianIndex({ value: 50, low: 50, high: 50, coverage: 0.5 }) === 0.5, "zero-width → 0.5 (centred)");
 
 // =============================================================================
 // visibility.ts
