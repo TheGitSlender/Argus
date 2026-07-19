@@ -29,6 +29,7 @@ updated: 2026-07-19
 
 ## 🗺️ Map of this brain
 
+- [[objectives-audit]] — **final compliance audit vs the brief**
 - [[architecture]] — system design, pipeline flow, stack
 - [[data-model]] — every table and *why* it exists
 - [[intelligence-layer]] — Track B deep dive: engines, prompts, verified outputs

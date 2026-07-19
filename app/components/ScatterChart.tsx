@@ -86,18 +86,6 @@ export default function ScatterChart({ data, onSelect }: ScatterChartProps) {
                 opacity={hovered === null || isHovered ? 0.9 : 0.35}
                 style={{ transition: "r 0.15s ease, opacity 0.15s ease" }}
               />
-              {!isHovered && (
-                <text
-                  x={toX(d.visibility) + 8}
-                  y={toY(d.capability) + 3}
-                  fill="var(--color-text)"
-                  fontSize="9"
-                  opacity={hovered === null ? 0.55 : 0.2}
-                  style={{ transition: "opacity 0.15s ease", pointerEvents: "none" }}
-                >
-                  {d.name}
-                </text>
-              )}
             </g>
           );
         })}
