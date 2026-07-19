@@ -33,7 +33,7 @@ npx prisma db seed    # loads 4 demo founder personas + thesis
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+
 
 ### Environment variables
 
