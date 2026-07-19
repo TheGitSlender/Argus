@@ -43,3 +43,6 @@ brain/.obsidian/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# design source files (reference only, not committed)
+Shared file analysis/
