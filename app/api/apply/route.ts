@@ -14,6 +14,9 @@ const bodySchema = z.object({
   founderName: z.string().min(1),
   deckText: z.string().min(50),
   email: z.string().email().nullish(),
+  /** Convergence: a discovered founder applying can name their handle so the
+   * scan-era profile, score, and history carry into the application. */
+  githubHandle: z.string().nullish(),
   artifactUrl: z.string().url().nullish(),
   context: founderContextSchema.partial().nullish(),
 });
@@ -27,7 +30,21 @@ export async function POST(req: Request) {
 
   try {
     // Founder Score persistence (FAQ 6): a returning founder keeps their score.
-    const existing = body.email ? await prisma.founder.findUnique({ where: { email: body.email } }) : null;
+    // Matched by email OR by a known sourced identity (outbound -> inbound convergence).
+    const byEmail = body.email ? await prisma.founder.findUnique({ where: { email: body.email } }) : null;
+    const byHandle =
+      !byEmail && body.githubHandle
+        ? (
+            await prisma.identity.findUnique({
+              where: { source_handle: { source: "GITHUB", handle: body.githubHandle } },
+              include: { founder: true },
+            })
+          )?.founder ?? null
+        : null;
+    const existing = byEmail ?? byHandle;
+    if (existing && body.email && !existing.email) {
+      await prisma.founder.update({ where: { id: existing.id }, data: { email: body.email } });
+    }
     const founder =
       existing ??
       (await prisma.founder.create({
