@@ -57,6 +57,8 @@ export async function GET() {
         outreach: opp.outreach,
         opportunityId: opp.id,
         daysInPipeline,
+        sector: opp.company.sector,
+        location: ((f?.context ?? {}) as { location?: string }).location ?? null,
       };
     });
 

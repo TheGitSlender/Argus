@@ -1,5 +1,10 @@
 // Ranking algorithm for discovered founders. Scores each candidate on thesis
-// fit, technical signals, recency, and hidden-gem potential.
+// fit, CAPABILITY (never popularity), recency, and hidden-gem potential.
+//
+// Iron rule: stars/forks/followers are visibility — they already live in
+// visibilityIndex and may only influence rank NEGATIVELY via the gap bonus.
+// Ranking by them would rebuild the network-gated system this project exists
+// to replace (handoff trap #2).
 
 import type { OutreachStatus } from "@prisma/client";
 
@@ -21,6 +26,8 @@ export interface FounderWithScore {
   outreach: { status: OutreachStatus } | null;
   opportunityId: string;
   daysInPipeline: number;
+  sector: string | null;
+  location: string | null;
 }
 
 export interface RankedFounder extends FounderWithScore {
@@ -49,26 +56,27 @@ function thesisGeoMatch(
   return 0;
 }
 
-function technicalSignalStrength(
+/** Capability points: the Founder Score composite when scored; for not-yet-
+ * scored discoveries, a small completion-evidence fallback (finished projects,
+ * steady cadence — quality markers, NOT popularity counts). */
+function capabilityStrength(
+  score: FounderWithScore["score"],
   signals: FounderWithScore["signals"],
 ): number {
-  let score = 0;
+  if (score?.composite) {
+    // 0-30 points, linear in the composite capability estimate.
+    return Math.min(30, score.composite.value * 0.3);
+  }
+  let fallback = 0;
   for (const sig of signals) {
     const meta = sig.meta as Record<string, unknown> | null;
     if (!meta) continue;
-
-    const stars = typeof meta.stars === "number" ? meta.stars : 0;
-    const forks = typeof meta.forks === "number" ? meta.forks : 0;
-    const followers = typeof meta.followers === "number" ? meta.followers : 0;
-
-    // Stars: 0-10 points (saturates at 500).
-    score += Math.min(10, (stars / 500) * 10);
-    // Forks: 0-5 points (saturates at 100).
-    score += Math.min(5, (forks / 100) * 5);
-    // Followers: 0-10 points (saturates at 1000).
-    score += Math.min(10, (followers / 1000) * 10);
+    const finished = typeof meta.finishedProjects === "number" ? meta.finishedProjects : 0;
+    fallback += Math.min(6, finished * 2);
+    if (meta.commitCadence === "steady") fallback += 3;
   }
-  return Math.min(25, score);
+  // Unscored candidates cap at 12 — running the pipeline is what earns rank.
+  return Math.min(12, fallback);
 }
 
 function recencyScore(daysInPipeline: number): number {
@@ -93,13 +101,13 @@ export function rankFounders(
   thesisGeos: string[],
 ): RankedFounder[] {
   const scored = founders.map((f) => {
-    const sectorPts = thesisSectorMatch(null, thesisSectors); // Company.sector not available here
-    const geoPts = thesisGeoMatch(null, thesisGeos); // Location from context not available here
-    const techPts = technicalSignalStrength(f.signals);
+    const sectorPts = thesisSectorMatch(f.sector, thesisSectors);
+    const geoPts = thesisGeoMatch(f.location, thesisGeos);
+    const capabilityPts = capabilityStrength(f.score, f.signals);
     const recencyPts = recencyScore(f.daysInPipeline);
     const gemPts = hiddenGemBonus(f.score?.capabilityVisibilityGap);
 
-    const rankScore = Math.round(sectorPts + geoPts + techPts + recencyPts + gemPts);
+    const rankScore = Math.round(sectorPts + geoPts + capabilityPts + recencyPts + gemPts);
 
     return {
       ...f,

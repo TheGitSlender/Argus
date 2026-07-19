@@ -64,6 +64,8 @@ export async function POST(
       outreach: null,
       opportunityId: opportunity.id,
       daysInPipeline,
+      sector: opportunity.company.sector,
+      location: ((f?.context ?? {}) as { location?: string }).location ?? null,
     };
 
     const sectors = thesis?.sectors ?? [];

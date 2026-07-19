@@ -14,6 +14,7 @@
     "test:unit": "tsx scripts/test-unit.ts",
     "test:intel": "tsx --env-file=.env scripts/test-intel.ts",
     "test:pipeline": "tsx --env-file=.env scripts/test-pipeline.ts",
+    "batch:score": "tsx --env-file=.env scripts/batch-score.ts",
     "test:track-a": "tsx --test scripts/track-a/*.test.ts",
     "test:track-a:import": "tsx --env-file=.env scripts/track-a/import-corpus.ts --apply",
     "test:track-a:resolve": "tsx --env-file=.env scripts/track-a/entity-resolution.ts --apply",

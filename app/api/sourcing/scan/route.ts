@@ -79,6 +79,8 @@ export async function POST() {
         outreach: opp.outreach,
         opportunityId: opp.id,
         daysInPipeline,
+        sector: opp.company.sector,
+        location: ((f?.context ?? {}) as { location?: string }).location ?? null,
       };
     });
 
