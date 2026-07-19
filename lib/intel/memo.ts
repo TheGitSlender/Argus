@@ -1,6 +1,8 @@
 import { MODELS, runLLM } from "../llm";
 import {
+  adversarialOutputSchema,
   memoDocumentSchema,
+  type AdversarialOutput,
   type AmbitionRead,
   type AxisScoreOutput,
   type InterviewPlaybook,
@@ -36,15 +38,29 @@ export function renderAmbitionSummary(a: AmbitionRead): string {
     .join("\n");
 }
 
-export async function adversarialPass(bandSummary: string, bundle: EvidenceBundle): Promise<string> {
+/** Render structured adversarial output to formatted markdown for the memo prompt. */
+export function renderAdversarialBullets(output: AdversarialOutput): string {
+  const severityOrder = { high: 0, medium: 1, low: 2 } as const;
+  const sorted = [...output.bullets].sort(
+    (a, b) => severityOrder[a.severity] - severityOrder[b.severity]
+  );
+  const lines = sorted.map((b) => {
+    const refs = b.evidenceRefs.length > 0 ? ` (evidence: ${b.evidenceRefs.join(", ")})` : "";
+    return `- [${b.severity.toUpperCase()}] ${b.point}${refs}`;
+  });
+  return `BEAR CASE (severity-ranked):\n${lines.join("\n")}\n\nSummary: ${output.summary}`;
+}
+
+export async function adversarialPass(bandSummary: string, bundle: EvidenceBundle): Promise<AdversarialOutput> {
   const r = await runLLM({
     step: "adversarial_pass",
     model: MODELS.heavy,
     system: ADVERSARIAL_SYSTEM,
     prompt: adversarialPrompt(bandSummary, renderEvidence(bundle)),
+    schema: adversarialOutputSchema,
     inputRefs: { founderId: bundle.founder.id ?? null },
   });
-  return r.text.trim();
+  return r.parsed;
 }
 
 export interface GenerateMemoOptions {
@@ -59,7 +75,8 @@ export interface GenerateMemoOptions {
 }
 
 export async function generateMemo(opts: GenerateMemoOptions): Promise<{ memo: MemoDocument; bearCase: string }> {
-  const bearCase = await adversarialPass(opts.bandSummary, opts.bundle);
+  const adversarial = await adversarialPass(opts.bandSummary, opts.bundle);
+  const bearCase = renderAdversarialBullets(adversarial);
 
   const playbookSummary = opts.playbook.questions
     .map((q) => `- [${q.targetDimension}] ${q.question} (${q.expectedBandReduction})`)
