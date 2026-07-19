@@ -57,18 +57,33 @@ export async function intakeOutboundFounder(data: OutboundIntakeData): Promise<I
       },
     }));
 
-  const company = await prisma.company.create({
-    data: { name: data.companyName ?? `${data.founderName} (pre-company)` },
-  });
+  // A re-scan of a known founder attaches to their open outbound opportunity
+  // instead of spawning a duplicate deal (and duplicate pre-company) per scan.
+  const existingOpen = identity
+    ? await prisma.opportunity.findFirst({
+        where: {
+          track: "OUTBOUND",
+          status: { in: ["SOURCED", "SCREENED"] },
+          founders: { some: { founderId: founder.id } },
+        },
+        orderBy: { createdAt: "desc" },
+      })
+    : null;
 
-  const opportunity = await prisma.opportunity.create({
-    data: {
-      companyId: company.id,
-      track: "OUTBOUND",
-      firstSignalAt: data.occurredAt ?? new Date(),
-      founders: { create: [{ founderId: founder.id }] },
-    },
-  });
+  let opportunity = existingOpen;
+  if (!opportunity) {
+    const company = await prisma.company.create({
+      data: { name: data.companyName ?? `${data.founderName} (pre-company)` },
+    });
+    opportunity = await prisma.opportunity.create({
+      data: {
+        companyId: company.id,
+        track: "OUTBOUND",
+        firstSignalAt: data.occurredAt ?? new Date(),
+        founders: { create: [{ founderId: founder.id }] },
+      },
+    });
+  }
 
   const signal = await prisma.signal.create({
     data: {
