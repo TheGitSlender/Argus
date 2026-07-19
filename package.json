@@ -13,7 +13,12 @@
     "db:studio": "prisma studio",
     "test:unit": "tsx scripts/test-unit.ts",
     "test:intel": "tsx --env-file=.env scripts/test-intel.ts",
-    "test:pipeline": "tsx --env-file=.env scripts/test-pipeline.ts"
+    "test:pipeline": "tsx --env-file=.env scripts/test-pipeline.ts",
+    "test:track-a": "tsx --test scripts/track-a/*.test.ts",
+    "test:track-a:import": "tsx --env-file=.env scripts/track-a/import-corpus.ts --apply",
+    "test:track-a:resolve": "tsx --env-file=.env scripts/track-a/entity-resolution.ts --apply",
+    "test:track-a:extract": "tsx --env-file=.env scripts/track-a/claim-extraction.ts --apply --limit 1",
+    "test:track-a:verify": "tsx --env-file=.env scripts/track-a/verify-handoff.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

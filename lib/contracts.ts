@@ -72,7 +72,12 @@ export const extractedClaimSchema = z.object({
   category: claimCategorySchema,
   /** e.g. "slide 7", "README", "HN comment" */
   sourceLocation: z.string().nullish(),
-  specificity: z.enum(["high", "medium", "low"]),
+  specificity: z.string().transform((val) => {
+    const lower = val.toLowerCase().trim();
+    if (lower.includes("high")) return "high" as const;
+    if (lower.includes("low")) return "low" as const;
+    return "medium" as const;
+  }),
 });
 export type ExtractedClaim = z.infer<typeof extractedClaimSchema>;
 
