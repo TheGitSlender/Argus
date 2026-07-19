@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useCallback, useEffect } from "react";
 
 const ArgusLogo = () => (
   <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
@@ -47,6 +48,18 @@ const SettingsIcon = () => (
   </svg>
 );
 
+const MenuIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M3 6h14M3 10h14M3 14h14" strokeLinecap="round" />
+  </svg>
+);
+
+const CloseIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M5 5l10 10M15 5l-10 10" strokeLinecap="round" />
+  </svg>
+);
+
 interface NavItem {
   href: string;
   label: string;
@@ -63,26 +76,55 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  // Close on Escape key.
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+    if (open) {
+      document.addEventListener("keydown", handleKey);
+      return () => document.removeEventListener("keydown", handleKey);
+    }
+  }, [open]);
 
   return (
-    <aside className="sidebar">
-      <Link href="/dashboard" className="flex items-center gap-2" style={{ color: "var(--color-text)", textDecoration: "none" }}>
-        <ArgusLogo />
-        <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "16px" }}>ARGUS</span>
-      </Link>
+    <>
+      {/* Hamburger — only visible on ≤900px via CSS */}
+      <button className="hamburger" onClick={() => setOpen(!open)} aria-label="Toggle navigation">
+        {open ? <CloseIcon /> : <MenuIcon />}
+      </button>
 
-      <nav className="sidebar-nav">
-        {NAV_ITEMS.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`side-link ${pathname === item.href ? "active" : ""}`}
-          >
-            {item.icon}
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-    </aside>
+      {/* Backdrop overlay — only visible on ≤900px when open */}
+      <div
+        className={`sidebar-overlay ${open ? "visible" : ""}`}
+        onClick={close}
+        aria-hidden="true"
+      />
+
+      <aside className={`sidebar ${open ? "open" : ""}`}>
+        <Link href="/dashboard" className="flex items-center gap-2" style={{ color: "var(--color-text)", textDecoration: "none" }}>
+          <ArgusLogo />
+          <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: "16px" }}>ARGUS</span>
+        </Link>
+
+        <nav className="sidebar-nav">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`side-link ${pathname === item.href ? "active" : ""}`}
+              onClick={close}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </aside>
+    </>
   );
 }

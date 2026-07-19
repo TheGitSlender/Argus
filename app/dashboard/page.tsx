@@ -191,7 +191,7 @@ export default function DashboardPage() {
                       <tr key={f.id}>
                         <td>
                           <Link href={`/founders/${f.id}`} style={{ textDecoration: "none", color: "var(--color-text)" }}>
-                            <div style={{ fontFamily: "var(--font-heading)", fontWeight: 600 }}>{f.name}</div>
+                            <div style={{ fontFamily: "var(--font-heading)", fontWeight: "var(--font-heading-weight)" }}>{f.name}</div>
                             <div className="text-muted" style={{ fontSize: 12 }}>{f.company}</div>
                           </Link>
                         </td>

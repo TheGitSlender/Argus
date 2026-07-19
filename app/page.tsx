@@ -29,10 +29,10 @@ export default function LandingPage() {
         <span className="tag tag-outline" style={{ marginBottom: "var(--space-4)", display: "inline-flex" }}>
           Underwriting intelligence for early-stage investors
         </span>
-        <h1 style={{ fontSize: 64, lineHeight: 1.04, letterSpacing: "-0.02em", margin: "var(--space-4) 0", maxWidth: 820 }}>
+        <h1 style={{ fontSize: "clamp(32px, 5vw, 64px)", lineHeight: 1.04, letterSpacing: "-0.02em", margin: "var(--space-4) 0", maxWidth: 820 }}>
           Argus sees the signal before the round is priced.
         </h1>
-        <p style={{ fontSize: 19, lineHeight: 1.6, maxWidth: 640, color: "color-mix(in srgb, var(--color-text) 78%, transparent)", margin: "0 0 var(--space-6)" }}>
+        <p style={{ fontSize: 19, lineHeight: 1.6, maxWidth: 640, color: "var(--color-text-secondary)", margin: "0 0 var(--space-6)" }}>
           Every claim a founder makes, checked against the record. Every founder scored on capability, not just visibility.
           Argus reads the pipeline your team can&apos;t get to, and tells you which parts of the story hold up.
         </p>
@@ -46,17 +46,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Hero image placeholder */}
-      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px 64px" }}>
-        <figure className="plate" style={{ aspectRatio: "16/7.5", margin: 0, background: "var(--color-surface)" }} />
-        <figcaption style={{ textAlign: "center", marginTop: "var(--space-2)" }}>
-          The pipeline view — capability plotted against visibility, refreshed as new signal arrives.
-        </figcaption>
-      </section>
-
       {/* The Problem */}
       <section id="platform" style={{ maxWidth: 1000, margin: "0 auto", padding: "64px 24px", borderTop: "1px solid var(--color-divider)" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "var(--space-8)" }}>
+        <div className="landing-problem-grid">
           <div>
             <h6 style={{ color: "var(--color-accent)" }}>The problem</h6>
             <h2 style={{ fontSize: 34, maxWidth: 360 }}>Most of what a fund is told, no one has checked.</h2>
@@ -74,7 +66,7 @@ export default function LandingPage() {
         <h2 style={{ fontSize: 34, marginBottom: "var(--space-6)", maxWidth: 520 }}>
           From inbound application to investment memo, in four passes.
         </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--space-4)" }}>
+        <div className="landing-steps-grid">
           {[
             { num: "01", title: "Intake", desc: "Founders apply directly or get routed in from scouts. Structured fields replace the deck-shaped guessing game." },
             { num: "02", title: "Verification", desc: "Every material claim is checked against data rooms, references and public sources, and marked verified, unverified, or contradicted." },
@@ -94,11 +86,11 @@ export default function LandingPage() {
 
       {/* Verification */}
       <section id="verification" style={{ borderTop: "1px solid var(--color-divider)", borderBottom: "1px solid var(--color-divider)" }}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "64px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "center" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "64px 24px" }} className="landing-verify-grid">
           <div>
             <h6 style={{ color: "var(--color-accent)" }}>Verification</h6>
             <h2 style={{ fontSize: 34, maxWidth: 440 }}>A trust label on every claim, not just a score on the founder.</h2>
-            <p style={{ maxWidth: 440, color: "color-mix(in srgb, var(--color-text) 78%, transparent)" }}>
+            <p style={{ maxWidth: 440, color: "var(--color-text-secondary)" }}>
               Argus doesn&apos;t just tell you what a founder said — it tells you how sure it is, and why. Contradictions get surfaced immediately, with the source that raised them.
             </p>
           </div>
@@ -139,13 +131,29 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+      <footer style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <ArgusLogo size={18} />
           <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 14 }}>ARGUS</span>
         </div>
-        <div className="text-muted" style={{ fontSize: 13 }}>© 2026 Argus. Underwriting intelligence for early-stage investors.</div>
+        <div className="text-muted" style={{ fontSize: 13 }}>&copy; 2026 Argus. Underwriting intelligence for early-stage investors.</div>
       </footer>
+
+      {/* Landing page responsive styles — scoped to avoid polluting the design system */}
+      <style>{`
+        .landing-problem-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: var(--space-8); }
+        .landing-steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+        .landing-verify-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); align-items: center; }
+
+        @media (max-width: 900px) {
+          .landing-problem-grid { grid-template-columns: 1fr; }
+          .landing-steps-grid { grid-template-columns: repeat(2, 1fr); }
+          .landing-verify-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 640px) {
+          .landing-steps-grid { grid-template-columns: 1fr; }
+        }
+      `}</style>
     </div>
   );
 }

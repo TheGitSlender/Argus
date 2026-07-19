@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import AppLayout from "@/app/components/AppLayout";
 
 type ScoreBand = {
   value: number;
@@ -63,13 +64,13 @@ type ScanResult = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  IDENTIFIED: "#8b5cf6",
-  DRAFTED: "#f59e0b",
-  SENT: "#3b82f6",
-  REPLIED: "#22c55e",
-  CONVERTED: "#10b981",
-  DECLINED: "#ef4444",
-  EXPIRED: "#6b7280",
+  IDENTIFIED: "var(--color-accent-2-300)",
+  DRAFTED: "var(--color-accent-2-400)",
+  SENT: "var(--color-accent-2-600)",
+  REPLIED: "var(--color-accent-2-700)",
+  CONVERTED: "var(--color-accent-2-500)",
+  DECLINED: "var(--color-accent-600)",
+  EXPIRED: "var(--color-neutral-500)",
 };
 
 function ScoreBar({ score }: { score: ScoreBand }) {
@@ -81,7 +82,7 @@ function ScoreBar({ score }: { score: ScoreBand }) {
           width: 48,
           height: 6,
           borderRadius: 3,
-          background: "var(--color-border)",
+          background: "var(--color-divider)",
           overflow: "hidden",
         }}
       >
@@ -95,30 +96,13 @@ function ScoreBar({ score }: { score: ScoreBand }) {
                 ? "var(--color-accent)"
                 : score.value >= 35
                   ? "var(--color-accent-2)"
-                  : "var(--color-muted)",
+                  : "var(--color-neutral-400)",
           }}
         />
       </div>
-      <span style={{ fontSize: 11, color: "var(--color-text-secondary)", minWidth: 24 }}>
+      <span style={{ fontSize: 11, color: "var(--color-text-muted)", minWidth: 24 }}>
         {score.value}
       </span>
-    </div>
-  );
-}
-
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string;
-  value: number | string;
-  accent?: string;
-}) {
-  return (
-    <div className="stat-card" style={{ borderTop: `3px solid ${accent || "var(--color-accent)"}` }}>
-      <div className="stat-value">{value}</div>
-      <div className="stat-label">{label}</div>
     </div>
   );
 }
@@ -135,32 +119,32 @@ function FounderCard({
   const [showDraft, setShowDraft] = useState(false);
   const signalMeta = founder.signals[0]?.meta ?? {};
   const status = founder.outreach?.status ?? "IDENTIFIED";
-  const statusColor = STATUS_COLORS[status] ?? "var(--color-muted)";
+  const statusColor = STATUS_COLORS[status] ?? "var(--color-neutral-500)";
 
   const sourceBadge =
-    founder.source === "GITHUB" ? { label: "GH", bg: "#1f2937" }
-    : founder.source === "DEVPOST" ? { label: "DP", bg: "#1e40af" }
-    : { label: "OT", bg: "#374151" };
+    founder.source === "GITHUB" ? { label: "GH", bg: "var(--color-neutral-800)" }
+    : founder.source === "DEVPOST" ? { label: "DP", bg: "var(--color-accent-2-600)" }
+    : { label: "OT", bg: "var(--color-neutral-700)" };
 
   return (
     <div
       className="card"
       style={{
-        padding: 16,
+        padding: "var(--space-4)",
         borderLeft: `3px solid ${statusColor}`,
         display: "flex",
         flexDirection: "column",
-        gap: 10,
+        gap: "var(--space-2)",
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--space-2)" }}>
+        <div style={{ minWidth: 0 }}>
           <div style={{ fontSize: 14, fontWeight: 600 }}>{founder.name}</div>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 2 }}>
+          <div style={{ fontSize: 12, color: "var(--color-text-muted)", marginTop: 2 }}>
             {founder.company}
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
           {founder.rank !== undefined && (
             <span
               style={{
@@ -168,7 +152,7 @@ function FounderCard({
                 fontWeight: 700,
                 color: "var(--color-accent)",
                 background: "var(--color-bg)",
-                border: "1px solid var(--color-border)",
+                border: "1px solid var(--color-divider)",
                 borderRadius: 4,
                 padding: "1px 5px",
               }}
@@ -180,7 +164,7 @@ function FounderCard({
             style={{
               fontSize: 9,
               fontWeight: 600,
-              color: "#fff",
+              color: "var(--color-bg)",
               background: sourceBadge.bg,
               borderRadius: 3,
               padding: "2px 5px",
@@ -193,7 +177,7 @@ function FounderCard({
             style={{
               fontSize: 9,
               fontWeight: 600,
-              color: "#fff",
+              color: "var(--color-bg)",
               background: statusColor,
               borderRadius: 3,
               padding: "2px 6px",
@@ -206,19 +190,19 @@ function FounderCard({
       </div>
 
       {founder.score && (
-        <div style={{ display: "flex", alignItems: "center", gap: 16, fontSize: 11 }}>
-          <span style={{ color: "var(--color-text-secondary)" }}>composite</span>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-3)", fontSize: 11, flexWrap: "wrap" }}>
+          <span style={{ color: "var(--color-text-muted)" }}>composite</span>
           <ScoreBar score={founder.score.composite} />
-          <span style={{ color: "var(--color-text-secondary)" }}>vi</span>
+          <span style={{ color: "var(--color-text-muted)" }}>vi</span>
           <span style={{ fontWeight: 600 }}>{founder.score.visibilityIndex}</span>
-          <span style={{ color: "var(--color-text-secondary)" }}>gap</span>
+          <span style={{ color: "var(--color-text-muted)" }}>gap</span>
           <span
             style={{
               fontWeight: 600,
               color:
                 founder.score.capabilityVisibilityGap > 0
                   ? "var(--color-accent)"
-                  : "var(--color-text-secondary)",
+                  : "var(--color-text-muted)",
             }}
           >
             {founder.score.capabilityVisibilityGap > 0 ? "+" : ""}
@@ -231,7 +215,7 @@ function FounderCard({
         <div
           style={{
             fontSize: 11,
-            color: "var(--color-text-secondary)",
+            color: "var(--color-text-muted)",
             lineHeight: 1.5,
             fontStyle: "italic",
           }}
@@ -245,7 +229,7 @@ function FounderCard({
           .filter(([, v]) => v !== null && v !== undefined)
           .slice(0, 4)
           .map(([key, val]) => (
-            <span key={key} className="tag" style={{ fontSize: 9 }}>
+            <span key={key} className="tag tag-neutral" style={{ fontSize: 9 }}>
               {key}: {String(val).slice(0, 20)}
             </span>
           ))}
@@ -266,9 +250,9 @@ function FounderCard({
             fontSize: 11,
             lineHeight: 1.6,
             background: "var(--color-bg)",
-            border: "1px solid var(--color-border)",
-            borderRadius: 6,
-            padding: 12,
+            border: "1px solid var(--color-divider)",
+            borderRadius: "var(--radius-md)",
+            padding: "var(--space-3)",
             whiteSpace: "pre-wrap",
             fontFamily: "var(--font-body)",
           }}
@@ -277,7 +261,7 @@ function FounderCard({
         </pre>
       )}
 
-      <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+      <div style={{ display: "flex", gap: 6, marginTop: "var(--space-1)" }}>
         {status === "IDENTIFIED" && (
           <button
             className="btn btn-primary"
@@ -319,7 +303,7 @@ function FounderCard({
   );
 }
 
-export default function SourcingPage() {
+function SourcingContent() {
   const [founders, setFounders] = useState<Founder[]>([]);
   const [stats, setStats] = useState<SourcingStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -411,28 +395,28 @@ export default function SourcingPage() {
 
   if (loading) {
     return (
-      <div style={{ padding: 32, color: "var(--color-text-secondary)" }}>
+      <div style={{ padding: "var(--space-8)", color: "var(--color-text-muted)" }}>
         Loading sourcing pipeline...
       </div>
     );
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 900 }}>
+    <div style={{ padding: "var(--space-6)", maxWidth: 900 }}>
       <div
         style={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 20,
+          marginBottom: "var(--space-5)",
         }}
       >
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, margin: 0 }}>Sourcing</h1>
+          <h2 style={{ margin: 0 }}>Sourcing</h2>
           <p
             style={{
               fontSize: 12,
-              color: "var(--color-text-secondary)",
+              color: "var(--color-text-muted)",
               margin: "4px 0 0",
             }}
           >
@@ -453,12 +437,12 @@ export default function SourcingPage() {
         <div
           className="card"
           style={{
-            padding: 12,
-            marginBottom: 16,
+            padding: "var(--space-3)",
+            marginBottom: "var(--space-4)",
             fontSize: 11,
-            color: "var(--color-text-secondary)",
+            color: "var(--color-text-muted)",
             display: "flex",
-            gap: 16,
+            gap: "var(--space-4)",
             flexWrap: "wrap",
           }}
         >
@@ -472,21 +456,36 @@ export default function SourcingPage() {
             Scan time: <strong>{(scanResult.scanDuration / 1000).toFixed(1)}s</strong>
           </span>
           {scanResult.errors.github && (
-            <span style={{ color: "#ef4444" }}>GitHub error</span>
+            <span style={{ color: "var(--color-accent-600)" }}>GitHub error</span>
           )}
           {scanResult.errors.devpost && (
-            <span style={{ color: "#ef4444" }}>DevPost error</span>
+            <span style={{ color: "var(--color-accent-600)" }}>DevPost error</span>
           )}
         </div>
       )}
 
       {stats && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 20 }}>
-          <StatCard label="Total" value={stats.total} accent="var(--color-accent)" />
-          <StatCard label="Identified" value={stats.identified} accent="#8b5cf6" />
-          <StatCard label="Drafted" value={stats.drafted} accent="#f59e0b" />
-          <StatCard label="Sent" value={stats.sent} accent="#3b82f6" />
-          <StatCard label="Converted" value={stats.converted} accent="#10b981" />
+        <div className="sourcing-stats">
+          <div className="stat-card" style={{ borderTop: "3px solid var(--color-accent)" }}>
+            <div className="stat-value">{stats.total}</div>
+            <div className="stat-label">Total</div>
+          </div>
+          <div className="stat-card" style={{ borderTop: "3px solid var(--color-accent-2-300)" }}>
+            <div className="stat-value">{stats.identified}</div>
+            <div className="stat-label">Identified</div>
+          </div>
+          <div className="stat-card" style={{ borderTop: "3px solid var(--color-accent-2-400)" }}>
+            <div className="stat-value">{stats.drafted}</div>
+            <div className="stat-label">Drafted</div>
+          </div>
+          <div className="stat-card" style={{ borderTop: "3px solid var(--color-accent-2-600)" }}>
+            <div className="stat-value">{stats.sent}</div>
+            <div className="stat-label">Sent</div>
+          </div>
+          <div className="stat-card" style={{ borderTop: "3px solid var(--color-accent-2-500)" }}>
+            <div className="stat-value">{stats.converted}</div>
+            <div className="stat-label">Converted</div>
+          </div>
         </div>
       )}
 
@@ -494,9 +493,9 @@ export default function SourcingPage() {
         <div
           className="card"
           style={{
-            padding: 48,
+            padding: "var(--space-8)",
             textAlign: "center",
-            color: "var(--color-text-secondary)",
+            color: "var(--color-text-muted)",
             fontSize: 13,
           }}
         >
@@ -505,7 +504,7 @@ export default function SourcingPage() {
             : "No founders found. Run a scan to discover outbound targets."}
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
           {founders.map((f) => (
             <FounderCard
               key={f.opportunityId}
@@ -517,5 +516,13 @@ export default function SourcingPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SourcingPage() {
+  return (
+    <AppLayout>
+      <SourcingContent />
+    </AppLayout>
   );
 }
