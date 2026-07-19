@@ -1,7 +1,7 @@
 // GitHub scanner: searches for promising founders by querying repositories
 // created in the last 30 days that match the thesis sectors.
 
-import { buildSectorQuery } from "./keywords";
+import { buildKeywordQuery, sectorKeywords } from "./keywords";
 import { intakeOutboundFounder } from "./intake";
 
 const GITHUB_API = "https://api.github.com";
@@ -78,20 +78,20 @@ function sleep(ms: number): Promise<void> {
 
 /** Search repos for a sector, return unique owner logins with repo metadata. */
 async function searchReposForSector(sector: string): Promise<Map<string, GitHubRepo>> {
-  const query = buildSectorQuery(sector);
-  if (!query) return new Map();
-
-  const url = `${GITHUB_API}/search/repositories?q=${encodeURIComponent(query)}&sort=stars&order=desc&per_page=30`;
-  const data = await githubFetch<{ items: GitHubRepo[] }>(url);
-  if (!data?.items) return new Map();
-
-  // Deduplicate by owner login (keep highest-starred repo per owner).
+  // Repo search has no OR groups — one query per topic keyword, merged.
   const byOwner = new Map<string, GitHubRepo>();
-  for (const repo of data.items) {
-    if (repo.owner.type !== "User") continue;
-    const existing = byOwner.get(repo.owner.login);
-    if (!existing || repo.stargazers_count > existing.stargazers_count) {
-      byOwner.set(repo.owner.login, repo);
+  for (const keyword of sectorKeywords(sector).slice(0, 3)) {
+    const query = buildKeywordQuery(keyword);
+    const url = `${GITHUB_API}/search/repositories?q=${encodeURIComponent(query)}&sort=updated&order=desc&per_page=15`;
+    const data = await githubFetch<{ items: GitHubRepo[] }>(url);
+    await sleep(TOKEN ? 300 : 1500); // search API: 30 req/min authenticated
+    if (!data?.items) continue;
+    for (const repo of data.items) {
+      if (repo.owner.type !== "User") continue;
+      const existing = byOwner.get(repo.owner.login);
+      if (!existing || repo.updated_at > existing.updated_at) {
+        byOwner.set(repo.owner.login, repo);
+      }
     }
   }
   return byOwner;
@@ -117,6 +117,7 @@ function buildRawContent(repo: GitHubRepo, user: GitHubUser): string {
     repo.language ? `Language: ${repo.language}` : null,
     repo.topics.length > 0 ? `Topics: ${repo.topics.join(", ")}` : null,
     `Created: ${repo.created_at}`,
+    `Last pushed: ${repo.updated_at}`,
     `URL: ${repo.html_url}`,
   ].filter(Boolean);
 
@@ -127,14 +128,16 @@ function buildRawContent(repo: GitHubRepo, user: GitHubUser): string {
  * Scan GitHub for promising founders matching the thesis sectors.
  * Returns discovered founders with their intake results.
  */
-export async function scanGitHub(sectors: string[]): Promise<ScanResult[]> {
+export async function scanGitHub(sectors: string[], maxPerSector = 5): Promise<ScanResult[]> {
   const results: ScanResult[] = [];
   const seenLogins = new Set<string>();
 
   for (const sector of sectors) {
     const owners = await searchReposForSector(sector);
+    let taken = 0;
 
     for (const [login, repo] of owners) {
+      if (taken >= maxPerSector) break;
       if (seenLogins.has(login)) continue;
       seenLogins.add(login);
 
@@ -174,6 +177,7 @@ export async function scanGitHub(sectors: string[]): Promise<ScanResult[]> {
           login: user.login,
           name: user.name || user.login,
         });
+        taken += 1;
       } catch (err) {
         console.warn(`[github] intake failed for ${login}:`, err);
       }

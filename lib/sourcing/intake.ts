@@ -63,7 +63,7 @@ export async function intakeOutboundFounder(data: OutboundIntakeData): Promise<I
     ? await prisma.opportunity.findFirst({
         where: {
           track: "OUTBOUND",
-          status: { in: ["SOURCED", "SCREENED"] },
+          status: { not: "DECIDED" },
           founders: { some: { founderId: founder.id } },
         },
         orderBy: { createdAt: "desc" },
