@@ -18,7 +18,7 @@ updated: 2026-07-19
 | Phase | Intelligence layer live-tested · Track A corpus shipped & integration-verified |
 | Branches | `main` · `track-b-intel` · `track-a-data` (Gates 0-1 ✅) · `integration/ab-test` (A+B merged, tests pass) |
 | Database | ✅ **Neon live** — schema pushed, seeded, all routes verified against it |
-| Deployment | ❌ Vercel not yet connected (env vars ready) |
+| Deployment | ✅ **Vercel live** — prod deploys `main`; 9 API routes served |
 | LLM runtime | ✅ OpenAI key active ($50 budget) — gpt-4.1-nano / mini / 4.1 tiers |
 | Pipeline | ✅ **End-to-end live over HTTP**: pipeline + persistence + interview loop + returning-founder (FAQ 6) + ReasoningLog traceability |
 | Synthetic corpus | ✅ 36 profiles / 40 signals / 54 claims / 4 contradiction cases (Track A) |
@@ -35,7 +35,7 @@ updated: 2026-07-19
 - [[research/founder-predictors]] — what actually predicts a good founder
 - [[demo-script]] — the 5-minute demo beats
 - Tracks: [[tracks/track-a-data]] · [[tracks/track-b-intelligence]] · [[tracks/track-c-experience]]
-- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]] → [[changelog/2026-07-19-persistence-and-api]] → [[changelog/2026-07-19-db-live]]
+- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]] → [[changelog/2026-07-19-persistence-and-api]] → [[changelog/2026-07-19-db-live]] → [[changelog/2026-07-19-streaming-memo-and-scan]]
 
 ## 👥 Team & tracks
 

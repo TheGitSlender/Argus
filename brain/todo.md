@@ -10,7 +10,7 @@ Status rollup in [[main]]. Per-commit history in `changelog/`.
 > [!danger] Blockers (user/team action)
 > - [x] ~~Create Neon Postgres~~ ✅ live, schema pushed, seeded
 > - [ ] **Share `DATABASE_URL` + `OPENAI_API_KEY` with teammates privately** (Track A Gate 4 importer needs the DB)
-> - [ ] **Connect repo to Vercel** — deploy from hour 1, not hour 22
+> - [x] ~~Connect repo to Vercel~~ ✅ live, prod tracks `main`
 > - [ ] Track C teammate starts (all API routes now live for them)
 
 ## Track B — Intelligence ([[tracks/track-b-intelligence]])
@@ -27,7 +27,8 @@ Status rollup in [[main]]. Per-commit history in `changelog/`.
 - [x] Live route testing — full pipeline, interview loop, returning-founder persistence all verified against Neon
 - [x] Interview-notes → Signal → delta-update loop endpoint (`POST /api/founders/[id]/signals`)
 - [x] NL query → structured filter endpoint (`POST /api/query`)
-- [ ] Streaming memo endpoint (demo polish)
+- [x] Streaming memo endpoint (`POST /api/opportunities/[id]/memo`, AI SDK streamObject, verified live)
+- [x] Outbound scan intake with entity resolution (`POST /api/scan`)
 
 ## Track A — Data & Memory ([[tracks/track-a-data]])
 

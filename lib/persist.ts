@@ -220,6 +220,43 @@ export async function savePlaybook(
   });
 }
 
+/** Everything the memo stage needs, loaded from Memory for one opportunity. */
+export async function loadMemoInputs(opportunityId: string) {
+  const opportunity = await prisma.opportunity.findUniqueOrThrow({
+    where: { id: opportunityId },
+    include: {
+      company: true,
+      founders: true,
+      axisScores: { orderBy: { createdAt: "desc" } },
+    },
+  });
+  const founderId = opportunity.founders[0]?.founderId;
+  if (!founderId) throw new Error("Opportunity has no linked founder");
+
+  const [bundle, scoreRow, questions, thesisRow] = await Promise.all([
+    assembleBundle(founderId),
+    prisma.founderScore.findUnique({ where: { founderId } }),
+    prisma.interviewQuestion.findMany({ where: { founderId }, orderBy: { createdAt: "desc" }, take: 6 }),
+    prisma.thesis.findFirst({ where: { active: true } }),
+  ]);
+  if (!scoreRow) throw new Error("Founder has no score yet — run the pipeline first.");
+
+  const latestByAxis = new Map<string, (typeof opportunity.axisScores)[number]>();
+  for (const a of opportunity.axisScores) if (!latestByAxis.has(a.axis)) latestByAxis.set(a.axis, a);
+
+  return {
+    opportunity,
+    founderId,
+    bundle,
+    snapshot: snapshotFromDb(scoreRow),
+    axisRows: latestByAxis,
+    playbookSummary: questions
+      .map((q) => `- [${q.targetDimension.toLowerCase()}] ${q.question} (${q.expectedBandReduction ?? ""})`)
+      .join("\n"),
+    thesis: thesisRow ? thesisConfigFromDb(thesisRow) : null,
+  };
+}
+
 const DECISION_TO_ENUM = { invest: "INVEST", pass: "PASS", request_info: "REQUEST_INFO" } as const;
 
 export async function saveMemo(opportunityId: string, memo: MemoDocument): Promise<void> {

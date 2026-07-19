@@ -201,6 +201,23 @@ export const memoDocumentSchema = z.object({
 });
 export type MemoDocument = z.infer<typeof memoDocumentSchema>;
 
+/** Streaming variant for the memo endpoint: record/computed fields replaced by
+ * stream-safe shapes (strict JSON-schema mode forbids open records). Converted
+ * to MemoDocument on persist — bearCase and the timer are injected server-side. */
+export const memoStreamSchema = z.object({
+  companySnapshot: z.string(),
+  investmentHypotheses: z.string(),
+  swot: z.string(),
+  problemAndProduct: z.string(),
+  tractionAndKpis: z.string(),
+  optionalSections: z.array(z.object({ title: z.string(), content: z.string() })),
+  decision: memoDecisionSchema,
+  decisionRationale: z.string(),
+  thesisFit: z.string(),
+  gaps: z.array(z.string()),
+});
+export type MemoStream = z.infer<typeof memoStreamSchema>;
+
 // ---- NL query bar -----------------------------------------------------------
 
 export const nlQueryFilterSchema = z.object({

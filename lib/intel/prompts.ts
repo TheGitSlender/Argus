@@ -160,7 +160,8 @@ You assemble INVESTMENT MEMOS. Rules:
 - Footnote factual assertions with their source: [claim:<id>]. Unfootnoted assertions must be your own analysis, clearly framed as such.
 - Decision: "invest" ($100K) only when evidence + thesis fit justify it despite stated risks; "request_info" when specific resolvable uncertainty blocks the decision (say what to request — usually the interview); "pass" when the evidence is disqualifying.`;
 
-export const memoPrompt = (
+/** Shared context block for both the JSON-mode memo and the streaming memo. */
+export const memoContext = (
   evidence: string,
   bandSummary: string,
   axisSummary: string,
@@ -186,7 +187,17 @@ FUND THESIS:
 ${thesisSummary || "(none configured)"}
 
 INTERVIEW PLAYBOOK (already generated — reference it in request_info decisions):
-${playbookSummary}
+${playbookSummary}`;
+
+export const memoPrompt = (
+  evidence: string,
+  bandSummary: string,
+  axisSummary: string,
+  bearCase: string,
+  thesisSummary: string,
+  playbookSummary: string,
+  ambitionSummary = ""
+) => `${memoContext(evidence, bandSummary, axisSummary, bearCase, thesisSummary, playbookSummary, ambitionSummary)}
 
 Respond with JSON only:
 {
