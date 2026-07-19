@@ -68,11 +68,22 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       persistTasks.push(saveMemo(id, result.memo));
     }
 
-    persistTasks.push(
-      prisma.opportunity.update({ where: { id }, data: { status: "DILIGENCE" } }).then(() => {})
-    );
+    // Only advance to DILIGENCE if at least one critical scoring stage succeeded.
+    const hasScore = result.founderScore !== null;
+    const hasAxes = result.axes !== null;
+    if (hasScore || hasAxes) {
+      persistTasks.push(
+        prisma.opportunity.update({ where: { id }, data: { status: "DILIGENCE" } }).then(() => {})
+      );
+    }
 
-    await Promise.all(persistTasks);
+    const persistResults = await Promise.allSettled(persistTasks);
+    const persistErrors = persistResults
+      .map((r, i) => (r.status === "rejected" ? `persist[${i}]: ${String(r.reason).split("\n")[0]}` : null))
+      .filter(Boolean);
+    if (persistErrors.length > 0) {
+      console.warn(`[pipeline] some persist tasks failed for ${id}:`, persistErrors);
+    }
 
     // Log pipeline errors to ReasoningLog for traceability.
     if (result.errors.length > 0) {

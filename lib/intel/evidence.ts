@@ -53,7 +53,9 @@ export function renderEvidence(bundle: EvidenceBundle): string {
   for (const s of signals) {
     const when = s.occurredAt ? ` | ${s.occurredAt.toISOString().slice(0, 10)}` : "";
     lines.push(`- [signal:${s.id}] source=${s.source}${when}${s.sourceUrl ? ` | ${s.sourceUrl}` : ""}`);
-    lines.push(`  ${s.rawContent.replaceAll("\n", " ").slice(0, 1200)}`);
+    const content = s.rawContent.replaceAll("\n", " ");
+    const truncated = content.length > 1200;
+    lines.push(`  ${truncated ? content.slice(0, 1200) + " [truncated]" : content}`);
     if (s.meta && Object.keys(s.meta).length > 0) {
       lines.push(`  meta: ${JSON.stringify(s.meta)}`);
     }

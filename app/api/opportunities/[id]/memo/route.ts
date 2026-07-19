@@ -65,8 +65,9 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
         ...object,
         optionalSections: Object.fromEntries(object.optionalSections.map((s) => [s.title, s.content])),
         bearCase,
-        signalToDecisionHours:
-          Math.round(((Date.now() - inputs.opportunity.firstSignalAt.getTime()) / 36e5) * 10) / 10,
+        signalToDecisionHours: inputs.opportunity.firstSignalAt
+          ? Math.round(((Date.now() - inputs.opportunity.firstSignalAt.getTime()) / 36e5) * 10) / 10
+          : null,
       };
       await saveMemo(id, memo);
       await prisma.reasoningLog.create({

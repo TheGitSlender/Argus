@@ -92,25 +92,43 @@ async function complete(
   prompt: string,
   temperature: number | undefined,
   maxTokens: number | undefined,
-  jsonMode: boolean
+  jsonMode: boolean,
+  retries = 1
 ) {
-  const started = Date.now();
-  const response = await getClient().chat.completions.create({
-    model,
-    messages: [
-      ...(system ? [{ role: "system" as const, content: system }] : []),
-      { role: "user" as const, content: prompt },
-    ],
-    temperature,
-    max_completion_tokens: maxTokens ?? 4096,
-    ...(jsonMode ? { response_format: { type: "json_object" as const } } : {}),
-  });
-  return {
-    text: response.choices[0]?.message?.content ?? "",
-    inputTokens: response.usage?.prompt_tokens ?? null,
-    outputTokens: response.usage?.completion_tokens ?? null,
-    latencyMs: Date.now() - started,
-  };
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const started = Date.now();
+    try {
+      const response = await getClient().chat.completions.create({
+        model,
+        messages: [
+          ...(system ? [{ role: "system" as const, content: system }] : []),
+          { role: "user" as const, content: prompt },
+        ],
+        temperature,
+        max_completion_tokens: maxTokens ?? 4096,
+        ...(jsonMode ? { response_format: { type: "json_object" as const } } : {}),
+      });
+      return {
+        text: response.choices[0]?.message?.content ?? "",
+        inputTokens: response.usage?.prompt_tokens ?? null,
+        outputTokens: response.usage?.completion_tokens ?? null,
+        latencyMs: Date.now() - started,
+      };
+    } catch (err) {
+      lastError = err;
+      const status = (err as { status?: number }).status;
+      const isRetryable = status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
+      if (attempt < retries && isRetryable) {
+        const delay = Math.min(1000 * 2 ** attempt, 8000);
+        console.warn(`[llm] transient error ${status} on attempt ${attempt + 1}, retrying in ${delay}ms...`);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
+      throw lastError;
+    }
+  }
+  throw lastError;
 }
 
 /**

@@ -155,9 +155,9 @@ export async function runOpportunityPipeline(
       bundle,
       bandSummary,
       axes: axes ?? {
-        founder: { value: 0, trend: "stable", rationale: " unavailable", citedClaimIds: [] },
-        market: { value: 0, trend: "stable", rationale: " unavailable", citedClaimIds: [] },
-        idea_vs_market: { value: 0, trend: "stable", rationale: " unavailable", citedClaimIds: [] },
+        founder: { value: 0, trend: "stable", rationale: "unavailable — axis scoring failed", citedClaimIds: [] },
+        market: { value: 0, trend: "stable", rationale: "unavailable — axis scoring failed", citedClaimIds: [] },
+        idea_vs_market: { value: 0, trend: "stable", rationale: "unavailable — axis scoring failed", citedClaimIds: [] },
       },
       playbook: playbook ?? { questions: [] },
       ambition,

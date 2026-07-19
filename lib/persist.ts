@@ -82,6 +82,8 @@ export function snapshotFromDb(row: FounderScore): FounderScoreSnapshot {
 }
 
 export function thesisConfigFromDb(row: Thesis): ThesisConfig {
+  const riskAppetites = ["conservative", "balanced", "aggressive"] as const;
+  const valid = riskAppetites.includes(row.riskAppetite as typeof riskAppetites[number]);
   return {
     name: row.name,
     sectors: row.sectors,
@@ -89,7 +91,7 @@ export function thesisConfigFromDb(row: Thesis): ThesisConfig {
     geographies: row.geographies,
     checkSizeUsd: row.checkSizeUsd,
     ownershipTargetPct: row.ownershipTargetPct,
-    riskAppetite: (row.riskAppetite as ThesisConfig["riskAppetite"]) ?? "balanced",
+    riskAppetite: valid ? (row.riskAppetite as ThesisConfig["riskAppetite"]) : "balanced",
   };
 }
 
@@ -193,19 +195,21 @@ export async function saveAxisScores(opportunityId: string, axes: AxisSet): Prom
 export async function applyValidations(
   validations: Array<{ claimId: string; result: ValidationResult }>
 ): Promise<void> {
-  for (const v of validations) {
-    await prisma.claim.update({
-      where: { id: v.claimId },
-      data: {
-        trustScore: v.result.trustScore,
-        verificationStatus: v.result.verificationStatus.toUpperCase() as "VERIFIED" | "UNVERIFIED" | "CONTRADICTED",
-        evidenceRefs: {
-          reasoning: v.result.reasoning,
-          contradictingSignalIds: v.result.contradictingSignalIds,
+  await Promise.all(
+    validations.map((v) =>
+      prisma.claim.update({
+        where: { id: v.claimId },
+        data: {
+          trustScore: v.result.trustScore,
+          verificationStatus: v.result.verificationStatus.toUpperCase() as "VERIFIED" | "UNVERIFIED" | "CONTRADICTED",
+          evidenceRefs: {
+            reasoning: v.result.reasoning,
+            contradictingSignalIds: v.result.contradictingSignalIds,
+          },
         },
-      },
-    });
-  }
+      })
+    )
+  );
 }
 
 export async function savePlaybook(
@@ -242,7 +246,11 @@ export async function loadMemoInputs(opportunityId: string) {
   const [bundle, scoreRow, questions, thesisRow] = await Promise.all([
     assembleBundle(founderId),
     prisma.founderScore.findUnique({ where: { founderId } }),
-    prisma.interviewQuestion.findMany({ where: { founderId }, orderBy: { createdAt: "desc" }, take: 6 }),
+    prisma.interviewQuestion.findMany({
+      where: { founderId, opportunityId },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
     prisma.thesis.findFirst({ where: { active: true } }),
   ]);
   if (!scoreRow) throw new Error("Founder has no score yet — run the pipeline first.");
