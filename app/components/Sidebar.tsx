@@ -26,6 +26,14 @@ const PipelineIcon = () => (
   </svg>
 );
 
+const SourcingIcon = () => (
+  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <circle cx="10" cy="10" r="3" />
+    <path d="M10 3a7 7 0 0 1 7 7M10 5.5a4.5 4.5 0 0 1 4.5 4.5" strokeLinecap="round" />
+    <path d="M10 1v2M10 17v2M1 10h2M17 10h2" strokeLinecap="round" opacity="0.4" />
+  </svg>
+);
+
 const IntakeIcon = () => (
   <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5">
     <path d="M10 4v12M4 10h12" strokeLinecap="round" />
@@ -48,6 +56,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: <DashboardIcon /> },
   { href: "/pipeline", label: "Pipeline", icon: <PipelineIcon /> },
+  { href: "/sourcing", label: "Sourcing", icon: <SourcingIcon /> },
   { href: "/intake", label: "Intake", icon: <IntakeIcon /> },
   { href: "/settings", label: "Settings", icon: <SettingsIcon /> },
 ];

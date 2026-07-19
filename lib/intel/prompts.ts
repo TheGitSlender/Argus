@@ -239,3 +239,43 @@ ${evidence}
 ${priorDeltaSummary ? `\nRECENT DELTA UPDATES (don't repeat these — only update what this NEW signal changes):\n${priorDeltaSummary}\n` : ""}
 Respond with JSON only:
 {"updates": [{"dimension": "execution"|"technicalDepth"|"problemInsight"|"resourcefulness"|"momentum", "newBand": {"value": <n>, "low": <n>, "high": <n>}, "rationale": "<1-2 sentences>"}]}`;
+
+// ---- Sourcing: reason + outreach prompts ------------------------------------
+
+export const REASON_SYSTEM = `${ANALYST_SYSTEM}
+
+You write a one-line summary of why a discovered founder is worth investigating.
+Rules:
+- Under 30 words.
+- Be specific about concrete signals (repo stars, commit recency, sector match).
+- Do not use vague adjectives ("impressive", "exciting") — cite numbers.
+- Do not mention the fund name.`;
+
+export const reasonPrompt = (name: string, company: string, signals: string, thesisSectors: string[]) => `FOUNDER: ${name}
+COMPANY: ${company || "pre-company"}
+THESIS SECTORS: ${thesisSectors.join(", ")}
+
+SIGNALS:
+${signals}
+
+Write one sentence (<30 words) explaining why this founder is interesting.`;
+
+export const OUTREACH_SYSTEM = `${ANALYST_SYSTEM}
+
+You draft a brief cold outreach message from a venture fund called Argus to a founder.
+Rules:
+- 2-3 sentences, under 100 words.
+- Mention "Argus" by name.
+- Be specific about what caught our attention — cite a concrete signal (repo, project, hackathon result).
+- Do not be generic. Do not use phrases like "we love what you're building."
+- Tone: professional but warm. Not stiff, not casual.
+- End with a soft CTA: invite them to share more about what they're building.`;
+
+export const outreachPrompt = (name: string, company: string, signals: string, thesisSectors: string[]) => `FOUNDER: ${name}
+COMPANY: ${company || "pre-company"}
+THESIS SECTORS: ${thesisSectors.join(", ")}
+
+SIGNALS:
+${signals}
+
+Write a 2-3 sentence outreach message (<100 words) from Argus to this founder.`;

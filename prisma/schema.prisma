@@ -88,6 +88,16 @@ enum QuestionOutcome {
   MIXED
 }
 
+enum OutreachStatus {
+  IDENTIFIED
+  DRAFTED
+  SENT
+  REPLIED
+  CONVERTED
+  DECLINED
+  EXPIRED
+}
+
 /// A person. The Founder Score lives here (via FounderScore) and persists
 /// across opportunities/applications — it never resets (brief FAQ 6).
 model Founder {
@@ -190,6 +200,7 @@ model Opportunity {
   founders      OpportunityFounder[]
   axisScores    AxisScore[]
   signals       Signal[]
+  outreach      Outreach?
 }
 
 model OpportunityFounder {
@@ -307,4 +318,25 @@ model ReasoningLog {
 
   @@index([cacheKey])
   @@index([step, createdAt])
+}
+
+/// Outbound activation tracking. One per opportunity — tracks the lifecycle
+/// from discovery through outreach to conversion.
+model Outreach {
+  id              String          @id @default(cuid())
+  opportunityId   String          @unique
+  opportunity     Opportunity     @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
+  status          OutreachStatus  @default(IDENTIFIED)
+  /// LLM-generated personalized outreach message.
+  draftMessage    String?         @db.Text
+  /// Why this founder was surfaced (e.g., "847-star repo, active last week").
+  reason          String?         @db.Text
+  sentAt          DateTime?
+  repliedAt       DateTime?
+  convertedAt     DateTime?
+  notes           String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@index([status])
 }
