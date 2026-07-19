@@ -22,6 +22,10 @@ npm run db:seed             # 4 demo founders so the UI has data immediately
 npm run dev
 ```
 
+## The Brain (Obsidian vault)
+
+`brain/` is an Obsidian vault — open the folder in Obsidian for graph view. It is the project's living memory: `main.md` is the hub (project description + status), `changelog/` gets one note per commit (what was done, what's still needed, sources), plus decision log, todo board, and per-track notes. **After every commit, add a changelog note and refresh the status table in `main.md`.**
+
 ## Ground rules
 
 1. **`lib/contracts.ts` and `prisma/schema.prisma` are frozen interfaces.** Announce any change in group chat BEFORE merging — all three tracks depend on them.
