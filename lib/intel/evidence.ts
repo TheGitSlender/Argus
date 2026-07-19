@@ -36,6 +36,30 @@ export interface EvidenceBundle {
   claims: EvidenceClaim[];
 }
 
+
+/** Corpus/bookkeeping keys must never reach a prompt: `synthetic` wording biases
+ * the screen, and `contradiction` role labels would tip off the Validator — it
+ * has to FIND contradictions, not read them off a label. */
+const HIDDEN_META_KEYS = new Set([
+  "synthetic",
+  "ingestionKey",
+  "corpusVersion",
+  "archetype",
+  "referenceClaimsCurated",
+  "contradiction",
+  "profileId",
+]);
+
+function sanitizeMeta(meta: Record<string, unknown> | null | undefined): Record<string, unknown> | null {
+  if (!meta) return null;
+  return Object.fromEntries(Object.entries(meta).filter(([k]) => !HIDDEN_META_KEYS.has(k)));
+}
+
+/** Neutralize corpus self-labeling in prose so evaluators judge the content. */
+function sanitizeContent(text: string): string {
+  return text.replace(/\bsynthetic\s+/gi, "");
+}
+
 /** Render a bundle as prompt text. Ids are inlined so model output can cite them. */
 export function renderEvidence(bundle: EvidenceBundle): string {
   const { founder, signals, claims } = bundle;
@@ -53,11 +77,12 @@ export function renderEvidence(bundle: EvidenceBundle): string {
   for (const s of signals) {
     const when = s.occurredAt ? ` | ${s.occurredAt.toISOString().slice(0, 10)}` : "";
     lines.push(`- [signal:${s.id}] source=${s.source}${when}${s.sourceUrl ? ` | ${s.sourceUrl}` : ""}`);
-    const content = s.rawContent.replaceAll("\n", " ");
+    const content = sanitizeContent(s.rawContent.replaceAll("\n", " "));
     const truncated = content.length > 1200;
     lines.push(`  ${truncated ? content.slice(0, 1200) + " [truncated]" : content}`);
-    if (s.meta && Object.keys(s.meta).length > 0) {
-      lines.push(`  meta: ${JSON.stringify(s.meta)}`);
+    const renderableMeta = sanitizeMeta(s.meta);
+    if (renderableMeta && Object.keys(renderableMeta).length > 0) {
+      lines.push(`  meta: ${JSON.stringify(renderableMeta)}`);
     }
   }
   lines.push(``, `EXTRACTED CLAIMS (assertions; verification status matters):`);
