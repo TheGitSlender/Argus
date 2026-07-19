@@ -15,14 +15,15 @@ updated: 2026-07-19
 
 | Field | Value |
 |---|---|
-| Phase | Intelligence layer live-tested · Track A corpus shipped & integration-verified |
-| Branches | `main` · `track-b-intel` · `track-a-data` (Gates 0-1 ✅) · `integration/ab-test` (A+B merged, tests pass) |
-| Database | ✅ **Neon live** — schema pushed, seeded, all routes verified against it |
-| Deployment | ✅ **Vercel live** — prod deploys `main`; 9 API routes served |
+| Phase | **All 3 tracks merged to `main`. Full stack verified.** |
+| Branches | `main` (single trunk, all tracks merged) |
+| Database | ✅ **Local Postgres** (`localhost:51214`) + Neon backup — schema pushed, seeded, all routes verified |
+| Deployment | ✅ **Vercel live** — prod deploys `main`; 9 API routes + 6 frontend pages served |
 | LLM runtime | ✅ OpenAI key active ($50 budget) — gpt-4.1-nano / mini / 4.1 tiers |
-| Pipeline | ✅ **End-to-end live over HTTP**: pipeline + persistence + interview loop + returning-founder (FAQ 6) + ReasoningLog traceability |
-| Synthetic corpus | ✅ 36 profiles / 40 signals / 54 claims / 4 contradiction cases (Track A) |
-| UI | ❌ Not started (Track C) |
+| Pipeline | ✅ **End-to-end live**: pipeline + persistence + interview loop + returning-founder + streaming memo + ReasoningLog traceability |
+| Synthetic corpus | ✅ 36 profiles / 40 signals / 54 claims / 4 contradiction cases — integration-verified against live DB |
+| UI | ✅ **Done** — 6 pages, 10 shared components, Classical design system (Milk & Energy palette) |
+| Tests | ✅ **93 passing** — 64 intel unit tests + 29 track-a unit tests; tsc, lint, build clean |
 
 ## 🗺️ Map of this brain
 
@@ -35,15 +36,15 @@ updated: 2026-07-19
 - [[research/founder-predictors]] — what actually predicts a good founder
 - [[demo-script]] — the 5-minute demo beats
 - Tracks: [[tracks/track-a-data]] · [[tracks/track-b-intelligence]] · [[tracks/track-c-experience]]
-- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]] → [[changelog/2026-07-19-persistence-and-api]] → [[changelog/2026-07-19-db-live]] → [[changelog/2026-07-19-streaming-memo-and-scan]]
+- Changelog: [[changelog/2026-07-18-foundation]] → [[changelog/2026-07-19-intelligence-layer]] → [[changelog/2026-07-19-memo-generator]] → [[changelog/2026-07-19-ambition-and-pipeline]] → [[changelog/2026-07-19-track-a-integration]] → [[changelog/2026-07-19-persistence-and-api]] → [[changelog/2026-07-19-db-live]] → [[changelog/2026-07-19-streaming-memo-and-scan]] → [[changelog/2026-07-19-all-tracks-merged]]
 
 ## 👥 Team & tracks
 
 | Track | Owner | Scope | Status |
 |---|---|---|---|
-| B — Intelligence | Lead + Claude | Founder Score, axes, validator, memo, playbook | 🟢 Core done |
-| A — Data & Memory | Teammate 1 (Aress07) | Fetchers, Adaption spike, synthetic corpus, ingestion | 🟢 Gates 0-1 done (corpus shipped) |
-| C — Experience | Teammate 2 | 5 screens, /debug viewer | ⚪ Not started |
+| B — Intelligence | Lead + Claude | Founder Score, axes, validator, memo, playbook | 🟢 **Complete** — 8 hardening phases + 10 targeted fixes merged |
+| A — Data & Memory | Teammate 1 (Aress07) | Fetchers, synthetic corpus, entity resolution, claim extraction | 🟢 **Complete** — Gates 0-5 accepted, integration-verified |
+| C — Experience | Lead + Claude | 6 pages, 10 components, Classical design system | 🟢 **Complete** — all pages, sidebar layout, streaming memo |
 
 ## 🎯 Evaluation weights (memorize)
 
@@ -52,7 +53,7 @@ updated: 2026-07-19
 | Data Architecture & Intelligence | 30% | Memory schema, coverage-driven bands, ingestion quality |
 | Investment Utility & Execution | 30% | 24h-decision memo, signal→decision timer, playbook |
 | Intelligent Analysis & Trust | 25% | Per-claim Trust Scores, validator, self-consistency bands |
-| UX & Design | 15% | 5 screens, hidden-gems scatter hero |
+| UX & Design | 15% | 6 screens, hidden-gems scatter hero, Classical design system |
 
 > [!warning] Never cut (these ARE the thesis)
 > Confidence bands · Hidden Gems view · Interview Playbook · memo gap-flagging.

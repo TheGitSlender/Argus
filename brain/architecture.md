@@ -12,9 +12,10 @@ Part of [[main]] · details in [[data-model]] and [[intelligence-layer]].
 | Layer | Choice | Why (see [[decisions]]) |
 |---|---|---|
 | Web | Next.js 16 (App Router), TypeScript, Tailwind | Client constraint: Next.js, no Streamlit |
-| DB | Postgres (Neon planned) + Prisma 6 | Battle-tested path under time pressure |
+| DB | Postgres (local `localhost:51214` + Neon backup) + Prisma 6 | Battle-tested path under time pressure |
 | LLM | OpenAI gpt-4.1 family via one wrapper (`lib/llm.ts`) | $50 user credits; `OPENAI_BASE_URL` swaps in open-source |
-| Charts | Recharts (radar, timeline, scatter) | Track C |
+| Charts | SVG manually implemented (Recharts installed but not used) | Track C — exact design fidelity |
+| Design | Classical system — Space Grotesk + Lora, Milk & Energy palette | Translated from design canvas HTML |
 | Batch data | Adaption Labs (Python, `/scripts/adaption/`) | ~2K credits; **never in request path** |
 
 ## Pipeline (the spine of the system)
@@ -38,7 +39,7 @@ flowchart TD
     J --> K
 ```
 
-Stages 4a/4b/4c run **in parallel**, then 5 + 6 in parallel, then 7 → 8. Orchestrated by `lib/intel/pipeline.ts` (`runOpportunityPipeline`), which is **DB-free**: route handlers will wrap it with persistence.
+Stages 4a/4b/4c run **in parallel**, then 5 + 6 in parallel, then 7 → 8. Orchestrated by `lib/intel/pipeline.ts` (`runOpportunityPipeline`), which is **DB-free**: route handlers wrap it with persistence.
 
 ## Layer boundaries
 
@@ -52,10 +53,36 @@ flowchart LR
         P[pipeline.ts stages]
     end
     subgraph Experience
-        UI[5 screens + /debug]
+        UI[6 pages + sidebar]
     end
     Memory --> Intelligence --> Experience
     Intelligence -- ReasoningLog: every LLM call --> Memory
 ```
+
+## API routes (11)
+
+| Route | Method | Purpose |
+|---|---|---|
+| `/api/opportunities` | GET | List all opportunities with scores |
+| `/api/opportunities/[id]/run` | POST | Run full pipeline on an opportunity |
+| `/api/opportunities/[id]/memo` | POST | Streaming memo generation (AI SDK) |
+| `/api/founders/[id]` | GET | Founder profile with scores, signals, claims |
+| `/api/founders/[id]/signals` | POST | Ingest signal → delta update loop |
+| `/api/apply` | POST | Intake form submission |
+| `/api/scan` | POST | Outbound scan intake with entity resolution |
+| `/api/thesis` | GET/POST | Read/write fund thesis config |
+| `/api/query` | POST | NL query → structured filter |
+
+## Frontend pages (7)
+
+| Route | Page |
+|---|---|
+| `/` | Landing (no sidebar) |
+| `/dashboard` | Dashboard with scatter chart + pipeline table |
+| `/pipeline` | Sortable/filterable pipeline table |
+| `/founders/[id]` | Founder profile with radar, dimensions, signals |
+| `/opportunities/[id]/memo` | Streaming investment memo |
+| `/intake` | Founder intake form with deck upload |
+| `/settings` | Thesis configuration |
 
 **Iron rules:** every LLM call goes through `runLLM()` (the log IS traceability + cache) · `ScoreHistory`/`ReasoningLog` append-only · visibility never leaks into capability · axes never averaged.
