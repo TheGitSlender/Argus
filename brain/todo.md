@@ -8,9 +8,10 @@ updated: 2026-07-19
 Status rollup in [[main]]. Per-commit history in `changelog/`.
 
 > [!danger] Blockers (user/team action)
-> - [ ] **Create Neon Postgres** and share `DATABASE_URL` — blocks persistence, routes, seeding, ReasoningLog
+> - [x] ~~Create Neon Postgres~~ ✅ live, schema pushed, seeded
+> - [ ] **Share `DATABASE_URL` + `OPENAI_API_KEY` with teammates privately** (Track A Gate 4 importer needs the DB)
 > - [ ] **Connect repo to Vercel** — deploy from hour 1, not hour 22
-> - [ ] Teammates pull repo, read `TEAM.md`, start Tracks A & C
+> - [ ] Track C teammate starts (all API routes now live for them)
 
 ## Track B — Intelligence ([[tracks/track-b-intelligence]])
 
@@ -22,8 +23,8 @@ Status rollup in [[main]]. Per-commit history in `changelog/`.
 - [x] Ambition & Drive read + research doc
 - [x] Pipeline orchestrator (DB-free)
 - [x] Persistence layer written (`lib/persist.ts`) — ⏳ runtime-untested until DB
-- [x] API routes written (7 endpoints incl. interview-notes loop, intake, NL query) — ⏳ runtime-untested until DB
-- [ ] Live route testing + Founder Score persistence demo — ⏳ blocked on DB
+- [x] API routes written (7 endpoints incl. interview-notes loop, intake, NL query)
+- [x] Live route testing — full pipeline, interview loop, returning-founder persistence all verified against Neon
 - [x] Interview-notes → Signal → delta-update loop endpoint (`POST /api/founders/[id]/signals`)
 - [x] NL query → structured filter endpoint (`POST /api/query`)
 - [ ] Streaming memo endpoint (demo polish)
