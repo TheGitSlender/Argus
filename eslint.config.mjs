@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Design source files (reference only)
+    "Shared file analysis/**",
   ]),
 ]);
 

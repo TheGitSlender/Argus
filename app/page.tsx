@@ -1,65 +1,151 @@
-import Image from "next/image";
+import Link from "next/link";
 
-export default function Home() {
+const ArgusLogo = ({ size = 26 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 26 26" fill="none">
+    <circle cx="13" cy="6" r="3.4" fill="var(--color-accent)" />
+    <circle cx="5" cy="18" r="3.4" fill="var(--color-accent-2)" />
+    <circle cx="21" cy="18" r="3.4" fill="var(--color-accent-2)" />
+  </svg>
+);
+
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div style={{ background: "var(--color-bg)", color: "var(--color-text)", minHeight: "100vh" }}>
+      {/* Navigation */}
+      <header className="nav" style={{ maxWidth: 1200, margin: "0 auto", paddingLeft: 24, paddingRight: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginRight: "auto" }}>
+          <ArgusLogo />
+          <span className="nav-brand" style={{ letterSpacing: "0.02em" }}>ARGUS</span>
+        </div>
+        <a href="#platform">Platform</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="#verification">Verification</a>
+        <Link href="/dashboard">Sign in</Link>
+        <Link className="btn btn-fill" href="/intake">Request access</Link>
+      </header>
+
+      {/* Hero */}
+      <section style={{ maxWidth: 920, margin: "0 auto", padding: "88px 24px 40px", textAlign: "left" }}>
+        <span className="tag tag-outline" style={{ marginBottom: "var(--space-4)", display: "inline-flex" }}>
+          Underwriting intelligence for early-stage investors
+        </span>
+        <h1 style={{ fontSize: 64, lineHeight: 1.04, letterSpacing: "-0.02em", margin: "var(--space-4) 0", maxWidth: 820 }}>
+          Argus sees the signal before the round is priced.
+        </h1>
+        <p style={{ fontSize: 19, lineHeight: 1.6, maxWidth: 640, color: "color-mix(in srgb, var(--color-text) 78%, transparent)", margin: "0 0 var(--space-6)" }}>
+          Every claim a founder makes, checked against the record. Every founder scored on capability, not just visibility.
+          Argus reads the pipeline your team can&apos;t get to, and tells you which parts of the story hold up.
+        </p>
+        <div style={{ display: "flex", gap: "var(--space-3)", flexWrap: "wrap" }}>
+          <Link className="btn btn-fill" href="/intake" style={{ fontSize: 15, padding: "12px 22px" }}>
+            Request access
+          </Link>
+          <a className="btn btn-secondary" href="#how-it-works" style={{ fontSize: 15, padding: "12px 22px" }}>
+            See how it works
+          </a>
+        </div>
+      </section>
+
+      {/* Hero image placeholder */}
+      <section style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px 64px" }}>
+        <figure className="plate" style={{ aspectRatio: "16/7.5", margin: 0, background: "var(--color-surface)" }} />
+        <figcaption style={{ textAlign: "center", marginTop: "var(--space-2)" }}>
+          The pipeline view — capability plotted against visibility, refreshed as new signal arrives.
+        </figcaption>
+      </section>
+
+      {/* The Problem */}
+      <section id="platform" style={{ maxWidth: 1000, margin: "0 auto", padding: "64px 24px", borderTop: "1px solid var(--color-divider)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: "var(--space-8)" }}>
+          <div>
+            <h6 style={{ color: "var(--color-accent)" }}>The problem</h6>
+            <h2 style={{ fontSize: 34, maxWidth: 360 }}>Most of what a fund is told, no one has checked.</h2>
+          </div>
+          <div style={{ textAlign: "justify" }}>
+            <p>A pitch deck is a claim, not a fact. &quot;40 design partners.&quot; &quot;An exclusive bank partnership.&quot; &quot;On track for launch.&quot; Some of it holds up. Some of it doesn&apos;t — and by the time a fund finds out which is which, the round has often already closed.</p>
+            <p>Argus sits underneath the pipeline and does the checking continuously: cross-referencing what a founder says against data rooms, reference calls, and public record, then surfacing the gap between a founder&apos;s visibility in the market and their underlying capability — before a term sheet is on the table, not after.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works */}
+      <section id="how-it-works" style={{ maxWidth: 1200, margin: "0 auto", padding: "64px 24px", borderTop: "1px solid var(--color-divider)" }}>
+        <h6 style={{ color: "var(--color-accent)" }}>How it works</h6>
+        <h2 style={{ fontSize: 34, marginBottom: "var(--space-6)", maxWidth: 520 }}>
+          From inbound application to investment memo, in four passes.
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "var(--space-4)" }}>
+          {[
+            { num: "01", title: "Intake", desc: "Founders apply directly or get routed in from scouts. Structured fields replace the deck-shaped guessing game." },
+            { num: "02", title: "Verification", desc: "Every material claim is checked against data rooms, references and public sources, and marked verified, unverified, or contradicted." },
+            { num: "03", title: "Scoring", desc: "A founder score across execution, market insight, team strength, capital efficiency and coachability — each with a confidence band, not a false precision." },
+            { num: "04", title: "Memo", desc: "A drafted investment memo — snapshot, hypotheses, SWOT and traction — ready for partner review, not a blank page." },
+          ].map((step) => (
+            <div className="card" key={step.num}>
+              <div className="card-kicker" style={{ fontVariantNumeric: "tabular-nums", fontSize: 26, fontFamily: "var(--font-heading)", color: "var(--color-accent-2)", opacity: 1 }}>
+                {step.num}
+              </div>
+              <div className="card-title">{step.title}</div>
+              <p className="card-body">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Verification */}
+      <section id="verification" style={{ borderTop: "1px solid var(--color-divider)", borderBottom: "1px solid var(--color-divider)" }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "64px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-8)", alignItems: "center" }}>
+          <div>
+            <h6 style={{ color: "var(--color-accent)" }}>Verification</h6>
+            <h2 style={{ fontSize: 34, maxWidth: 440 }}>A trust label on every claim, not just a score on the founder.</h2>
+            <p style={{ maxWidth: 440, color: "color-mix(in srgb, var(--color-text) 78%, transparent)" }}>
+              Argus doesn&apos;t just tell you what a founder said — it tells you how sure it is, and why. Contradictions get surfaced immediately, with the source that raised them.
+            </p>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+            {[
+              { claim: "40 design partners onboarded, average NPS of 61.", meta: "Data room, cross-checked with 3 customer calls", tag: "Verified", tagStyle: { background: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)" } },
+              { claim: "Projected $180K ARR by Q4 2026.", meta: "Founder deck only, no independent confirmation", tag: "Unverified", tagStyle: { background: "var(--color-neutral-100)", color: "var(--color-neutral-800)" } },
+              { claim: "Claims an exclusive bank-consortium partnership.", meta: "Consortium spokesperson states no exclusivity exists", tag: "Contradicted", tagStyle: { background: "var(--color-accent-100)", color: "var(--color-accent-800)" }, border: "var(--color-accent)" },
+            ].map((item, i) => (
+              <div className="card" key={i} style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", ...(item.border ? { borderColor: item.border } : {}) }}>
+                <div>
+                  <div className="card-title" style={{ fontSize: 15 }}>{item.claim}</div>
+                  <div className="card-meta">{item.meta}</div>
+                </div>
+                <span className="tag" style={item.tagStyle}>{item.tag}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Band */}
+      <section className="band-accent" style={{ padding: "72px 24px" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
+          <h2 style={{ fontSize: 36, color: "var(--color-bg)", marginBottom: "var(--space-3)" }}>
+            See your pipeline the way Argus sees it.
+          </h2>
+          <p style={{ color: "color-mix(in srgb, var(--color-bg) 85%, transparent)", marginBottom: "var(--space-6)", fontSize: 17 }}>
+            Request access and we&apos;ll load your active thesis within a day.
           </p>
+          <div style={{ display: "flex", gap: "var(--space-2)", justifyContent: "center", flexWrap: "wrap" }}>
+            <input className="input" placeholder="Work email" style={{ maxWidth: 280, background: "var(--color-bg)", borderColor: "transparent" }} />
+            <Link className="btn" href="/intake" style={{ background: "var(--color-bg)", color: "var(--color-accent)", fontSize: 15, padding: "0 22px" }}>
+              Request access
+            </Link>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Footer */}
+      <footer style={{ maxWidth: 1200, margin: "0 auto", padding: "32px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <ArgusLogo size={18} />
+          <span style={{ fontFamily: "var(--font-heading)", fontWeight: 700, fontSize: 14 }}>ARGUS</span>
         </div>
-      </main>
+        <div className="text-muted" style={{ fontSize: 13 }}>© 2026 Argus. Underwriting intelligence for early-stage investors.</div>
+      </footer>
     </div>
   );
 }
