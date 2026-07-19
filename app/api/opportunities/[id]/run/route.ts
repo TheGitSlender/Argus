@@ -12,6 +12,7 @@ import {
 } from "@/lib/persist";
 
 // Full pipeline for one opportunity: assemble evidence -> run -> persist all.
+// Handles partial results gracefully — persists whatever succeeded, logs errors.
 export const maxDuration = 300;
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -44,14 +45,57 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json(result);
     }
 
-    await saveFounderScore(founderId, result.founderScore!, result.ambition);
-    await Promise.all([
-      applyValidations(result.validations),
-      saveAxisScores(id, result.axes!),
-      savePlaybook(founderId, id, result.playbook!),
-      saveMemo(id, result.memo!),
-      prisma.opportunity.update({ where: { id }, data: { status: "DILIGENCE" } }),
-    ]);
+    // Persist whatever succeeded — don't force-unwrap nullable fields.
+    const persistTasks: Promise<void>[] = [];
+
+    if (result.founderScore) {
+      persistTasks.push(saveFounderScore(founderId, result.founderScore, result.ambition));
+    }
+
+    if (result.validations.length > 0) {
+      persistTasks.push(applyValidations(result.validations));
+    }
+
+    if (result.axes) {
+      persistTasks.push(saveAxisScores(id, result.axes));
+    }
+
+    if (result.playbook) {
+      persistTasks.push(savePlaybook(founderId, id, result.playbook));
+    }
+
+    if (result.memo) {
+      persistTasks.push(saveMemo(id, result.memo));
+    }
+
+    // Only advance to DILIGENCE if at least one critical scoring stage succeeded.
+    const hasScore = result.founderScore !== null;
+    const hasAxes = result.axes !== null;
+    if (hasScore || hasAxes) {
+      persistTasks.push(
+        prisma.opportunity.update({ where: { id }, data: { status: "DILIGENCE" } }).then(() => {})
+      );
+    }
+
+    const persistResults = await Promise.allSettled(persistTasks);
+    const persistErrors = persistResults
+      .map((r, i) => (r.status === "rejected" ? `persist[${i}]: ${String(r.reason).split("\n")[0]}` : null))
+      .filter(Boolean);
+    if (persistErrors.length > 0) {
+      console.warn(`[pipeline] some persist tasks failed for ${id}:`, persistErrors);
+    }
+
+    // Log pipeline errors to ReasoningLog for traceability.
+    if (result.errors.length > 0) {
+      await prisma.reasoningLog.create({
+        data: {
+          step: "pipeline_errors",
+          model: "pipeline",
+          inputRefs: { opportunityId: id, founderId, errors: result.errors } as object,
+          output: JSON.stringify(result.errors),
+        },
+      });
+    }
 
     return NextResponse.json(result);
   } catch (error) {

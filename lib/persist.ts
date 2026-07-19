@@ -17,7 +17,7 @@ import {
 import type { EvidenceBundle } from "./intel/evidence";
 import type { FounderScoreResult } from "./intel/founder-score";
 import type { AxisSet } from "./intel/memo";
-import { compositeBand } from "./intel/band-math";
+import { compositeBand, medianIndex } from "./intel/band-math";
 
 // =============================================================================
 // Persistence: the only place where intelligence results touch Prisma.
@@ -82,6 +82,8 @@ export function snapshotFromDb(row: FounderScore): FounderScoreSnapshot {
 }
 
 export function thesisConfigFromDb(row: Thesis): ThesisConfig {
+  const riskAppetites = ["conservative", "balanced", "aggressive"] as const;
+  const valid = riskAppetites.includes(row.riskAppetite as typeof riskAppetites[number]);
   return {
     name: row.name,
     sectors: row.sectors,
@@ -89,7 +91,7 @@ export function thesisConfigFromDb(row: Thesis): ThesisConfig {
     geographies: row.geographies,
     checkSizeUsd: row.checkSizeUsd,
     ownershipTargetPct: row.ownershipTargetPct,
-    riskAppetite: (row.riskAppetite as ThesisConfig["riskAppetite"]) ?? "balanced",
+    riskAppetite: valid ? (row.riskAppetite as ThesisConfig["riskAppetite"]) : "balanced",
   };
 }
 
@@ -119,14 +121,20 @@ export async function saveFounderScore(
     update: fields,
   });
   await prisma.scoreHistory.createMany({
-    data: DIMENSION_KEYS.map((dim) => ({
-      founderId,
-      dimension: DIM_TO_ENUM[dim],
-      oldBand: prev ? (prev[dim] as object) : undefined,
-      newBand: s[dim],
-      causeSignalId: causeSignalId ?? null,
-      rationale: result.dimensions[dim].samples[0]?.rationale ?? "scored from full evidence bundle",
-    })),
+    data: DIMENSION_KEYS.map((dim) => {
+      const band = s[dim];
+      const idx = medianIndex(band);
+      const position = idx < 0.4 ? "lower end" : idx > 0.6 ? "upper end" : "centred";
+      const base = result.dimensions[dim].samples[0]?.rationale ?? "scored from full evidence bundle";
+      return {
+        founderId,
+        dimension: DIM_TO_ENUM[dim],
+        oldBand: prev ? (prev[dim] as object) : undefined,
+        newBand: band,
+        causeSignalId: causeSignalId ?? null,
+        rationale: `${base} [band position: ${position} (${idx.toFixed(2)})]`,
+      };
+    }),
   });
 }
 
@@ -187,19 +195,21 @@ export async function saveAxisScores(opportunityId: string, axes: AxisSet): Prom
 export async function applyValidations(
   validations: Array<{ claimId: string; result: ValidationResult }>
 ): Promise<void> {
-  for (const v of validations) {
-    await prisma.claim.update({
-      where: { id: v.claimId },
-      data: {
-        trustScore: v.result.trustScore,
-        verificationStatus: v.result.verificationStatus.toUpperCase() as "VERIFIED" | "UNVERIFIED" | "CONTRADICTED",
-        evidenceRefs: {
-          reasoning: v.result.reasoning,
-          contradictingSignalIds: v.result.contradictingSignalIds,
+  await Promise.all(
+    validations.map((v) =>
+      prisma.claim.update({
+        where: { id: v.claimId },
+        data: {
+          trustScore: v.result.trustScore,
+          verificationStatus: v.result.verificationStatus.toUpperCase() as "VERIFIED" | "UNVERIFIED" | "CONTRADICTED",
+          evidenceRefs: {
+            reasoning: v.result.reasoning,
+            contradictingSignalIds: v.result.contradictingSignalIds,
+          },
         },
-      },
-    });
-  }
+      })
+    )
+  );
 }
 
 export async function savePlaybook(
@@ -236,7 +246,11 @@ export async function loadMemoInputs(opportunityId: string) {
   const [bundle, scoreRow, questions, thesisRow] = await Promise.all([
     assembleBundle(founderId),
     prisma.founderScore.findUnique({ where: { founderId } }),
-    prisma.interviewQuestion.findMany({ where: { founderId }, orderBy: { createdAt: "desc" }, take: 6 }),
+    prisma.interviewQuestion.findMany({
+      where: { founderId, opportunityId },
+      orderBy: { createdAt: "desc" },
+      take: 6,
+    }),
     prisma.thesis.findFirst({ where: { active: true } }),
   ]);
   if (!scoreRow) throw new Error("Founder has no score yet — run the pipeline first.");

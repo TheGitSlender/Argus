@@ -9,10 +9,16 @@ Every consequential choice, newest first. Context in [[main]].
 
 | # | Date | Decision | Why | Revisit if |
 |---|---|---|---|---|
+| 16 | 07-19 | Specificity normalization via `z.string().transform()` in `extractedClaimSchema` | `gpt-4.1-nano` consistently returns invalid enum values (e.g., "Very High") — preprocess normalizes before validation | Model quality improves, switch back to strict enum |
+| 15 | 07-19 | Local Postgres for dev (`localhost:51214`) via Docker | Colleague's DB setup, synthetic data testing requires local instance | Team agrees on shared dev DB |
+| 14 | 07-19 | Track C: all pages as `"use client"` with `fetch()` on mount | Simpler than server components for data-fetching pages; all API routes exist | Performance issues with large datasets |
+| 13 | 07-19 | Track C: `AppLayout` pattern (sidebar wraps each page, no nested layout) | Flexibility for pages without sidebar (landing) | Too much repetition |
+| 12 | 07-19 | Track C: pure CSS design system, no component library | Exact fidelity to design canvas HTML; no dependency overhead | Component library needed for complex interactions |
+| 11 | 07-19 | Track C: SVG charts implemented manually (Recharts not used) | Exact control over classical design system aesthetics | Chart complexity grows |
 | 10 | 07-19 | Ambition & Drive read as a SEPARATE softer stage, not a 6th scored dimension | Ideas change; person persists. Keeps the strict 5-dim score intact while capturing "true ambition" ([[research/founder-predictors]]) | Judges want it folded into the score |
 | 9 | 07-19 | No solo-founder or first-timer penalty despite 2× team-success data | Penalizing solo/unknown founders rebuilds the network-gated bias the challenge exists to kill; surfaced as memo risk flag instead | — (mission-locked) |
 | 8 | 07-19 | Work on feature branch `track-b-intel` | Parallel tracks without stepping on main | — |
-| 7 | 07-18 | Fail-soft ReasoningLog (warn once, keep running) when DB absent | DB creation deferred by team; pipeline testable with key only | Remove warning once Neon exists |
+| 7 | 07-18 | Fail-soft ReasoningLog (warn once, keep running) when DB absent | DB creation deferred by team; pipeline testable with key only | Remove warning once DB exists |
 | 6 | 07-18 | JSON-mode + zod parse + 1 retry (not strict json_schema API) | Works on ANY OpenAI-compatible endpoint incl. open-source servers | Malformed-JSON rate grows |
 | 5 | 07-18 | gpt-4.1 family (nano/mini/full), NOT gpt-5 reasoning models | Bands need `temperature` sampling; gpt-5 reasoning models don't support it. 4.1-mini is cheap + capable | Budget pressure → drop tiers via env |
 | 4 | 07-18 | OpenAI instead of Anthropic; `OPENAI_BASE_URL` escape hatch | User has $50 OpenAI credits; base-URL swap enables Groq/Ollama open-source with zero code change | — |

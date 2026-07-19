@@ -5,6 +5,7 @@
 - Work only on `track-a-data`.
 - Read this file and `TRACK_A_STATUS.md` before each work session.
 - Implement exactly one gate at a time. Do not start the next gate until the current gate's checks pass and the user accepts it.
+- Update `TRACK_A_STATUS.md` whenever a gate advances, a build decision changes, or new verification evidence is produced.
 - Before editing a tracked file, use Git history to identify its creator. Edit only files created by `Aress07`; request explicit permission for every exception.
 - Preserve unrelated changes and untracked files.
 - Do not modify `lib/contracts.ts`, `prisma/schema.prisma`, `lib/llm.ts`, `prisma/seed.ts`, or `package.json` without explicit per-file permission.
@@ -32,7 +33,7 @@ Acceptance: dependency installation leaves tracked files unchanged, the test dat
 
 Acceptance: 100% schema-valid JSONL, unique stable IDs, all archetypes present, and every deliberate contradiction has both source sides.
 
-### Gate 2 — Adaption five-row spike
+### Deferred gate — Adaption five-row spike
 
 - Add an isolated Python workflow under `scripts/adaption/`.
 - Upload five JSONL rows, estimate first, and stop if the estimate exceeds 50 credits.
@@ -41,7 +42,7 @@ Acceptance: 100% schema-valid JSONL, unique stable IDs, all archetypes present, 
 
 Acceptance: all five rows return, validate, remain attributable to inputs, and have recorded evaluation and credit usage.
 
-### Gate 3 — Full deck and claim batch
+### Deferred gate — Full Adaption deck and claim batch
 
 - Process 10 synthetic decks per document with a versioned universal extraction prompt.
 - Require claim text, category, source location, and specificity.
@@ -50,7 +51,7 @@ Acceptance: all five rows return, validate, remain attributable to inputs, and h
 
 Acceptance: 100% schema validity, zero invented numerical claims, at least 85% category agreement, at least 95% source-location retention, and full claim-to-deck traceability.
 
-### Gate 4 — Idempotent Postgres importer
+### Gate 2 — Idempotent Postgres importer
 
 - Add a standalone importer invoked with `npx tsx`; do not edit existing package scripts or seed files.
 - Import Founder, Company, Opportunity, Identity, Signal, and Claim through the existing schema.
@@ -59,7 +60,7 @@ Acceptance: 100% schema validity, zero invented numerical claims, at least 85% c
 
 Acceptance: dry-run counts are correct, first import creates the intended corpus, second import creates zero duplicates, and sampled evidence chains are valid.
 
-### Gate 5 — Entity resolution
+### Gate 3 — Entity resolution
 
 - Auto-link exact email or exact source/handle matches at confidence >= 0.95.
 - Send normalized name plus company/location matches to review at confidence 0.80–0.94.
@@ -68,16 +69,16 @@ Acceptance: dry-run counts are correct, first import creates the intended corpus
 
 Acceptance: repeats resolve to one Founder, homonyms stay separate, ambiguous cases remain unresolved, and reruns are idempotent.
 
-### Gate 6 — Runtime claim-extraction fallback
+### Gate 4 — Local deck extraction and runtime claim extraction
 
-- Add a replay script for Signals not handled by Adaption.
+- Add deterministic local deck-text extraction and a replay script for Signals not handled by Adaption.
 - Call existing `runLLM()` with `MODELS.extract`, `extractionOutputSchema`, step `extract_claims`, and `inputRefs.signalId`.
 - Keep caching enabled and begin with three Signals.
 - Skip Adaption-processed Signals and prevent duplicate Claims.
 
 Acceptance: valid Claims are created, paid calls are logged once, repeated runs hit cache, and unsupported facts are not invented.
 
-### Gate 7 — Handoff and freeze
+### Gate 5 — Handoff and freeze
 
 - Document corpus shape, commands, counts, Adaption spend/evaluation, importer order, entity thresholds, and known gaps.
 - Demonstrate hidden-gem, cold-start, contradiction, and persistent-identity cases.
@@ -85,12 +86,12 @@ Acceptance: valid Claims are created, paid calls are logged once, repeated runs 
 
 Acceptance: another teammate can rebuild Track A from a clean test database and query all four demonstration cases.
 
-### Stretch gate — One live fetcher
+### Stretch gate — Live fetchers
 
-- Begin only after Gates 0–7 are accepted and only with explicit activation.
-- Implement GitHub first with fixtures and one optional live smoke test.
+- Begin only after Gates 0–5 are accepted and only with explicit activation.
+- Implement GitHub first with fixtures and one optional live smoke test, then HN, Devpost, arXiv, and Product Hunt only if explicitly activated.
 - Store popularity metrics as visibility metadata only; never use them as capability evidence.
-- Keep HN, Devpost, arXiv, and Product Hunt deferred.
+- Keep all live sources deferred until the synthetic pipeline works end to end.
 
 ## Per-gate verification protocol
 
@@ -104,7 +105,8 @@ Acceptance: another teammate can rebuild Track A from a clean test database and 
 
 ## Fixed assumptions
 
-- The primary path is synthetic data followed by Adaption; public-source fetchers are deferred.
-- Gate 0 uses named local Prisma Postgres/PGlite; Adaption and OpenAI credentials are required only before their first live gates.
+- The primary path is synthetic data through the local pipeline; Adaption and public-source fetchers are deferred until core Track A functionality works end to end.
+- Gate 0 uses named local Prisma Postgres/PGlite; Adaption and OpenAI-compatible credentials are required only before their first live gates.
+- During development, runtime extraction may use Groq through the inherited OpenAI-compatible `runLLM()` boundary; switching to OpenAI later is environment-only and must not fork the pipeline.
 - The challenge PDF is currently absent. If supplied, reconcile it before continuing because the handoff names it as source of truth.
 - Existing tracked files remain immutable unless the user authorizes a named exception.

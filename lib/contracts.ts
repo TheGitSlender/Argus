@@ -72,7 +72,12 @@ export const extractedClaimSchema = z.object({
   category: claimCategorySchema,
   /** e.g. "slide 7", "README", "HN comment" */
   sourceLocation: z.string().nullish(),
-  specificity: z.enum(["high", "medium", "low"]),
+  specificity: z.string().transform((val) => {
+    const lower = val.toLowerCase().trim();
+    if (lower.includes("high")) return "high" as const;
+    if (lower.includes("low")) return "low" as const;
+    return "medium" as const;
+  }),
 });
 export type ExtractedClaim = z.infer<typeof extractedClaimSchema>;
 
@@ -124,6 +129,21 @@ export const validationResultSchema = z.object({
   contradictingSignalIds: z.array(z.string()).default([]),
 });
 export type ValidationResult = z.infer<typeof validationResultSchema>;
+
+// ---- Stage 7: adversarial pass (structured) ---------------------------------
+
+export const adversarialBulletSchema = z.object({
+  point: z.string(),
+  severity: z.enum(["high", "medium", "low"]),
+  evidenceRefs: z.array(z.string()),
+});
+export type AdversarialBullet = z.infer<typeof adversarialBulletSchema>;
+
+export const adversarialOutputSchema = z.object({
+  bullets: z.array(adversarialBulletSchema).min(2).max(6),
+  summary: z.string(),
+});
+export type AdversarialOutput = z.infer<typeof adversarialOutputSchema>;
 
 // ---- Stage 8: interview playbook --------------------------------------------
 
