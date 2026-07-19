@@ -17,13 +17,15 @@ updated: 2026-07-19
 |---|---|
 | Phase | **All 3 tracks merged to `main`. Full stack verified.** |
 | Branches | `main` (single trunk, all tracks merged) |
-| Database | ✅ **Local Postgres** (`localhost:51214`) + Neon backup — schema pushed, seeded, all routes verified |
+| Database | ✅ **Neon = canonical (prod)** — corpus imported (41 founders / 94 claims); local Postgres instances are per-dev scratch |
 | Deployment | ✅ **Vercel live** — prod deploys `main`; 9 API routes + 6 frontend pages served |
 | LLM runtime | ✅ OpenAI key active ($50 budget) — gpt-4.1-nano / mini / 4.1 tiers |
 | Pipeline | ✅ **End-to-end live**: pipeline + persistence + interview loop + returning-founder + streaming memo + ReasoningLog traceability |
 | Synthetic corpus | ✅ 36 profiles / 40 signals / 54 claims / 4 contradiction cases — integration-verified against live DB |
 | UI | ✅ **Done** — 6 pages, 10 shared components, Classical design system (Milk & Energy palette) |
 | Tests | ✅ **93 passing** — 64 intel unit tests + 29 track-a unit tests; tsc, lint, build clean |
+
+> [!warning] Open: batch-score the 36 corpus profiles in prod (≈$5-15) — see [[changelog/2026-07-19-team-merge-review]]
 
 ## 🗺️ Map of this brain
 

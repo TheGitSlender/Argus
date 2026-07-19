@@ -13,6 +13,15 @@ const band = (value: number, low: number, high: number, coverage?: number) => ({
 });
 
 async function main() {
+  // The seed WIPES everything. Fine on a local DB; on the shared Neon instance
+  // it destroys live pipeline results, so it refuses without an explicit flag.
+  if (process.env.DATABASE_URL?.includes("neon.tech") && process.env.FORCE_SEED !== "1") {
+    console.error(
+      "Refusing to wipe the SHARED Neon database (this deletes scores, memos, ReasoningLog).\n" +
+        "If you really mean it, coordinate with the team and run: FORCE_SEED=1 npm run db:seed"
+    );
+    process.exit(1);
+  }
   // Idempotent-ish for dev: wipe in FK-safe order. Fine before we have real data.
   await prisma.$transaction([
     prisma.reasoningLog.deleteMany(),
