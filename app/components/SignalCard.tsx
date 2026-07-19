@@ -16,12 +16,12 @@ interface SignalCardProps {
 function trustBadge(trust: string) {
   const t = trust.toLowerCase();
   if (t === "verified") {
-    return { label: "Verified", bg: "#e6f4ea", color: "#1e7e34" };
+    return { label: "Verified", bg: "var(--color-accent-2-100)", color: "var(--color-accent-2-800)" };
   }
   if (t === "contradicted") {
-    return { label: "Contradicted", bg: "#fde8e8", color: "#c62828" };
+    return { label: "Contradicted", bg: "var(--color-accent-100)", color: "var(--color-accent-800)" };
   }
-  return { label: "Unverified", bg: "#fff8e1", color: "#f57f17" };
+  return { label: "Unverified", bg: "var(--color-neutral-100)", color: "var(--color-neutral-800)" };
 }
 
 function relTime(iso: string) {
