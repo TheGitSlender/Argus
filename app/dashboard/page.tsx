@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AppLayout from "@/app/components/AppLayout";
 import ScatterChart from "@/app/components/ScatterChart";
@@ -36,6 +37,7 @@ interface RawOpp {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [founders, setFounders] = useState<Founder[] | null>(null);
   const [thesis, setThesis] = useState<Thesis | null>(null);
   const [query, setQuery] = useState("");
@@ -162,13 +164,16 @@ export default function DashboardPage() {
               <div className="card">
                 <div className="card-kicker">Capability vs. Visibility</div>
                 <ScatterChart
-                  data={founders.map((f) => ({
-                    id: f.id,
-                    name: f.name,
-                    company: f.company,
-                    visibility: f.visibility,
-                    capability: f.capability,
-                  }))}
+                  data={founders
+                    .filter((f) => f.capability > 0)
+                    .map((f) => ({
+                      id: f.id,
+                      name: f.name,
+                      company: f.company,
+                      visibility: f.visibility,
+                      capability: f.capability,
+                    }))}
+                  onSelect={(id) => router.push(`/founders/${id}`)}
                 />
               </div>
 

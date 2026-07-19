@@ -12,9 +12,10 @@ interface DataPoint {
 
 interface ScatterChartProps {
   data: DataPoint[];
+  onSelect?: (id: string) => void;
 }
 
-export default function ScatterChart({ data }: ScatterChartProps) {
+export default function ScatterChart({ data, onSelect }: ScatterChartProps) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const width = 480;
@@ -74,6 +75,7 @@ export default function ScatterChart({ data }: ScatterChartProps) {
             <g key={d.id}
               onMouseEnter={() => setHovered(d.id)}
               onMouseLeave={() => setHovered(null)}
+              onClick={() => onSelect?.(d.id)}
               style={{ cursor: "pointer" }}
             >
               <circle
@@ -106,6 +108,7 @@ export default function ScatterChart({ data }: ScatterChartProps) {
         <div className="scatter-tooltip" style={{ position: "relative", marginTop: -8, marginBottom: 4, alignSelf: "flex-start" }}>
           <strong>{hoveredPoint.name}</strong>
           <span>{hoveredPoint.company}</span>
+          <span style={{ opacity: 0.6 }}> — capability {hoveredPoint.capability}, visibility {hoveredPoint.visibility} · click to open profile</span>
         </div>
       )}
 
